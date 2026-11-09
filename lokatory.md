@@ -83,3 +83,4 @@ Všechny Page Objecty v projektu byly refaktorovány tak, aby primárně využí
 | **Cena pole** | `input[data-test="course_price_input"]` | Číselný vstup pro cenu v Kč |
 | **Nahrání souboru** | `input[data-test="course_file_input"]` | File input pro obrázek/podklady |
 | **Tlačítko Vytvořit kurz** | `div[data-test="course_form_submit_button_container"] button` | Odeslání a založení kurzu v systému |
+
