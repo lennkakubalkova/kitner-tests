@@ -65,3 +65,4 @@ def registruj_uzivatele():
 
 if __name__ == "__main__":
     registruj_uzivatele()
+

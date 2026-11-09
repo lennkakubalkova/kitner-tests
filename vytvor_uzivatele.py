@@ -67,3 +67,4 @@ def vytvor_skutecneho_uzivatele():
 
 if __name__ == "__main__":
     vytvor_skutecneho_uzivatele()
+

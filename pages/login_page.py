@@ -2,18 +2,19 @@ from playwright.sync_api import Page
 from pages.base_page import BasePage
 
 class LoginPage(BasePage):
-    """Page Object for the Login page (/login)."""
+    """Page Object for the Login page (/login) using robust data-test/data-testid attributes."""
 
     URL = f"{BasePage.BASE_URL}/login"
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.email_input = page.locator("#email_input")
-        self.password_input = page.locator("#password_input")
-        self.submit_button = page.locator('button[type="submit"]')
-        self.heading = page.locator('h1, h2, h3, div:has-text("Přihlášení")').first
-        self.register_link = page.locator('a[href="/register"]')
-        self.forgot_password_link = page.locator('a[href="/forgot-password"]')
+        self.form = page.locator('form[data-test="login_form"], form[data-testid="login_form"]')
+        self.email_input = page.locator('input[data-test="email_input"], input[data-testid="email_input"]')
+        self.password_input = page.locator('input[data-test="password_input"], input[data-testid="password_input"]')
+        self.submit_button = page.locator('button[data-test="login_button"], button[data-testid="login_button"]')
+        self.heading = page.locator('div[data-test="login_text"], div[data-testid="login_text"]')
+        self.register_link = page.locator('a[data-test="register_link"], a[data-testid="register_link"]')
+        self.forgot_password_link = page.locator('a[data-test="forgot_password_link"], a[data-testid="forgot_password_link"]')
 
     def open(self):
         """Navigate directly to the login page."""
@@ -34,5 +35,10 @@ class LoginPage(BasePage):
             self.password_input.clear()
 
         self.submit_button.click()
-        self.page.wait_for_timeout(1500)
-
+        if email and password:
+            try:
+                self.nav_logout.wait_for(state="visible", timeout=4000)
+            except Exception:
+                pass
+        else:
+            self.page.wait_for_timeout(1000)
