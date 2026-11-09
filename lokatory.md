@@ -84,3 +84,18 @@ Všechny Page Objecty v projektu byly refaktorovány tak, aby primárně využí
 | **Nahrání souboru** | `input[data-test="course_file_input"]` | File input pro obrázek/podklady |
 | **Tlačítko Vytvořit kurz** | `div[data-test="course_form_submit_button_container"] button` | Odeslání a založení kurzu v systému |
 
+
+---
+
+## 6. Zapomenuté heslo (`/forgot-password`)
+
+| Element / Prvek | Selektor (data-test / data-testid) | Popis / Použití |
+| :--- | :--- | :--- |
+| **Kontejner stránky** | `div[data-test="page_container"]` | Hlavní kontejner stránky |
+| **Sekce formuláře** | `section[data-test="forgot_password_section"]` | Sekce pro zadání emailu pro reset hesla |
+| **Popisný text** | `div[data-test="forget_password_p"]` | Instrukce „Zapoměli jste své heslo?...“ |
+| **Vstup pro Email** | `input[data-test="email_input"]` | Pole pro zadání emailové adresy uživatele |
+| **Tlačítko Potvrdit** | `button[data-test="submit_button"]` | Odeslání formuláře pro reset hesla |
+| **Chybová zpráva** | `span[data-test="email_input_errors"]` | Validační zpráva (povinné pole, neexistující uživatel, limit) |
+| **Kontejner chyb** | `div[data-test="email_input_errors_div"]` | Kontejner chybových hlášek pod inputem |
+| **Odkaz z přihlašovací stránky** | `a[data-test="forgot_password_link"]` | Odkaz „Zapomněli jste heslo?“ na `/login` |

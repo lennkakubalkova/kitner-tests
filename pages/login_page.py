@@ -42,3 +42,9 @@ class LoginPage(BasePage):
                 pass
         else:
             self.page.wait_for_timeout(1000)
+
+    def click_forgot_password(self):
+        """Click on 'Zapomněli jste heslo?' link."""
+        self.forgot_password_link.click()
+        self.page.wait_for_load_state("networkidle")
+

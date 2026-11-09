@@ -78,11 +78,23 @@ Každý náš test kombinuje minimálně 3 až 5 nezávislých úrovní ověřen
 
 ---
 
+### Oblast 4: Obnova hesla (Forgot Password)
+
+| ID testu | Název testu | Prováděné kontroly (Asserts) | Proč je kontrola dostatečná |
+| :--- | :--- | :--- | :--- |
+| **RST-01** | `test_navigation_from_login_to_forgot_password` | 1. Odkaz `a[data-test="forgot_password_link"]` je viditelný na `/login`<br>2. Přesměrování na `/forgot-password`<br>3. Zobrazení popisu `div[data-test="forget_password_p"]`<br>4. Přítomnost `input[data-test="email_input"]` a `button[data-test="submit_button"]`<br>5. Přítomnost navigace | Ověřuje funkční propojení a dostupnost formuláře pro obnovu přístupu. |
+| **RST-02** | `test_forgot_password_empty_email_validation` | 1. URL zůstává na `/forgot-password`<br>2. Chybová hláška `"The email field is required."` v `span[data-test="email_input_errors"]` | Zabraňuje odeslání prázdné žádosti a ověřuje specifickou chybovou hlášku. |
+| **RST-03** | `test_forgot_password_nonexistent_email_validation` | 1. URL zůstává na `/forgot-password`<br>2. Chybová hláška `"We can't find a user with that email address."`<br>3. Žádný pád serveru (žádná 500) | Ověřuje validaci identity uživatele a zamezuje odesílání emailů na neexistující účty. |
+| **RST-04** | `test_forgot_password_registered_user_submission` | 1. Odeslání formuláře s emailem registrovaného uživatele odešle POST požadavek na backend<br>2. Backend vrátí platný status (200 OK nebo 422 při rate limiting)<br>3. Při rate limiting je uživatel kultivovaně informován (`"Please wait before retrying."`) bez pádu aplikace | End-to-end ověření komunikace s autentizačním backendem včetně ošetření throttling limitu. |
+
+---
+
 ## 3. Závěr vyhodnocení
 
-Všech **18 testů** splňuje nejpřísnější kritéria spolehlivého testování:
+Všech **22 testů** splňuje nejpřísnější kritéria spolehlivého testování:
 - **Žádný test se nespoléhá pouze na URL adresu.**
 - Všechny selektory využívají stabilní atributy **`data-test` a `data-testid`**.
 - Všechny úspěšné stavy kontrolují změny v **DOM navigaci (menu)** a **přítomnost/absenci uživatelských prvků**.
 - Všechny negativní stavy kontrolují **přesné znění chybových hlášek** generovaných aplikací.
 - Testy ověřují **oddělení rolí (RBAC)** – rozlišují anonymního návštěvníka, běžného studenta a lektora se specifickými právy správy kurzů.
+- Pokryty jsou všechny fáze životního cyklu účtu: **Registrace**, **Přihlášení**, **Odhlášení**, **Obnova zapomenutého hesla** a **Správa katalogu kurzů**.

@@ -29,6 +29,7 @@ class TestLogin:
         assert courses_page.nav_my_courses.is_visible(), "Link 'Moje kurzy' must be visible"
 
         # Privilege checks specific to lector role
+        courses_page.add_course_button.wait_for(state="visible", timeout=10000)
         assert courses_page.add_course_button.is_visible(), "Lector must see 'Přidat kurz' button"
         assert courses_page.add_iteration_buttons.count() > 0, "Lector must see 'Přidat iteraci' button on courses"
 
@@ -120,6 +121,7 @@ class TestLogin:
 
         courses_page = CoursesPage(page)
         assert courses_page.is_logged_in(), "Precondition: user must be logged in"
+        courses_page.add_course_button.wait_for(state="visible", timeout=10000)
         assert courses_page.add_course_button.is_visible(), "Precondition: lector button visible"
 
         # Perform logout
