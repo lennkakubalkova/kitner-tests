@@ -37,13 +37,21 @@ def lector_credentials():
 @pytest.fixture(scope="session")
 def registered_user(browser):
     """
-    Session fixture that registers a genuine new user in the application
-    using the Page Object Model (RegisterPage) and genuine form submission.
+    Session fixture creating a genuine registered user in the application.
+    Uses RegisterPage with standard data-test / data-testid locators:
+      - input[data-test="name_input"]
+      - input[data-test="email_input"]
+      - input[data-test="password_input"]
+      - input[data-test="password_again_input"]
+      - button[data-test="register_button"]
     """
     context = browser.new_context(viewport=Config.VIEWPORT)
     page = context.new_page()
+    page.set_default_timeout(Config.DEFAULT_TIMEOUT)
+
     user_data = generate_user_data(name_prefix="Tester Real")
 
+    # Registrace přes Page Object Model RegisterPage s data-test selektory
     reg_page = RegisterPage(page).open()
     reg_page.register(
         name=user_data["name"],
@@ -52,9 +60,10 @@ def registered_user(browser):
         password_confirmation=user_data["password_confirmation"]
     )
 
-    # Log out to leave user in clean state for subsequent tests
-    if reg_page.is_logged_in():
-        reg_page.logout()
+    # Ověření úspěšné registrace a čisté odhlášení před spuštěním testů
+    assert reg_page.is_logged_in(), f"Uživatel {user_data['email']} nebyl po registraci úspěšně přihlášen"
+    reg_page.logout()
+    assert reg_page.is_logged_out(), "Uživatel nebyl po registraci úspěšně odhlášen"
 
     context.close()
     return user_data
