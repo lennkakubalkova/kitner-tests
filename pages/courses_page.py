@@ -31,6 +31,17 @@ class CoursesPage(BasePage):
         self.modal_price_input = page.locator('input[data-test="course_price_input"], input[data-testid="course_price_input"]')
         self.modal_submit_button = page.locator('div[data-test="course_form_submit_button_container"] button, button[data-test="registration_link"]:has-text("Vytvořit kurz")')
 
+        # Modal 'Přidat iteraci' locators (US-15)
+        self.iteration_modal_container = page.locator('div[data-test="create_course_iteration_container"]')
+        self.iteration_form = page.locator('form[data-test="course_iteration_form"]')
+        self.iteration_start_input = page.locator('input[data-test="course_start_input"]')
+        self.iteration_end_input = page.locator('input[data-test="course_end_input"]')
+        self.iteration_day_select = page.locator('select[data-test="course_day_select"]')
+        self.iteration_time_input = page.locator('input[data-test="course_time_input"]')
+        self.iteration_location_input = page.locator('input[data-test="course_location_input"]')
+        self.iteration_submit_button = page.locator('form[data-test="course_iteration_form"] button[data-test="registration_link"]')
+
+
     def open(self):
         """Navigate to the courses page."""
         self.page.goto(self.URL)

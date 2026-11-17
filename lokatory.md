@@ -99,3 +99,58 @@ Všechny Page Objecty v projektu byly refaktorovány tak, aby primárně využí
 | **Chybová zpráva** | `span[data-test="email_input_errors"]` | Validační zpráva (povinné pole, neexistující uživatel, limit) |
 | **Kontejner chyb** | `div[data-test="email_input_errors_div"]` | Kontejner chybových hlášek pod inputem |
 | **Odkaz z přihlašovací stránky** | `a[data-test="forgot_password_link"]` | Odkaz „Zapomněli jste heslo?“ na `/login` |
+
+---
+
+## 7. Modální okno: Přidat iteraci kurzu (Lektor)
+
+| Element / Prvek | Selektor (data-test / data-testid) | Popis / Použití |
+| :--- | :--- | :--- |
+| **Kontejner modálu** | `div[data-test="create_course_iteration_container"]` | Celé vyskakovací okno modálu iterace |
+| **Formulář iterace** | `form[data-test="course_iteration_form"]` | `<form>` uvnitř modálního okna iterace |
+| **Datum zahájení** | `input[data-test="course_start_input"]` | Datepicker pole pro zahájení kurzu |
+| **Datum ukončení** | `input[data-test="course_end_input"]` | Datepicker pole pro ukončení kurzu |
+| **Den konání** | `select[data-test="course_day_select"]` | Rozbalovací nabídka dnů v týdnu |
+| **Čas konání** | `input[data-test="course_time_input"]` | Časový vstup pro začátek lekce |
+| **Místo / forma výuky** | `input[data-test="course_location_input"]` | Textový vstup pro adresu nebo online formu |
+| **Tlačítko odeslání** | `form[data-test="course_iteration_form"] button[data-test="registration_link"]` | Potvrzení a vypsání nového běhu |
+
+---
+
+## 8. Detail kurzu a vypsané termíny (`/courses/{id}`)
+
+| Element / Prvek | Selektor (data-test / data-testid) | Popis / Použití |
+| :--- | :--- | :--- |
+| **Název kurzu** | `h1[data-test="course_name"]` | Hlavní název kurzu v detailu |
+| **Popis kurzu** | `p[data-test="course_description"]` | Detailní obsahový popis kurzu |
+| **Cena kurzu** | `p[data-test="course_price"]` | Cena kurzu v Kč |
+| **Nadpis termínů** | `h2[data-test="iterations_heading"]` | Nadpis sekce „Vypsané běhy kurzu:“ |
+| **Karty termínů** | `div[data-test^="iteration_"]` | Karty jednotlivých běhů (`iteration_1`, `iteration_2`...) |
+| **Nezávazná registrace (student)** | `button[data-test="registration_link"]:has-text("Nezávazná registrace")` | Tlačítko pro registraci na volný termín |
+| **Zobrazení studentů (lektor)** | `button[data-test="registration_link"]:has-text("Přihlášení")` | Lektorské tlačítko přehledu přihlášených studentů |
+
+---
+
+## 9. Uživatelský profil (`/profile`)
+
+| Element / Prvek | Selektor (data-test / data-testid) | Popis / Použití |
+| :--- | :--- | :--- |
+| **Formulář profilu** | `form[data-test="profile_form"]` | Hlavní editační formulář profilu |
+| **Jméno uživatele** | `input[data-test="profile_name_input"]` | Pole pro zobrazení/editaci celého jména |
+| **Email uživatele** | `input[data-test="profile_email_input"]` | Pole pro zobrazení/editaci emailu |
+| **IČO** | `input[data-test="profile_ico_input"]` | Fakturační IČO s kontrolou modulo 11 |
+| **Telefon** | `input[data-test="profile_phone_input"]` | Kontaktní telefonní číslo |
+| **Tlačítko Uložit** | `form[data-test="profile_form"] button[data-test="registration_link"]:has-text("Uložit")` | Uložení změn a přesměrování na `/home` |
+
+---
+
+## 10. Úvodní rozcestník (`http://testovani.kitner.cz`)
+
+| Element / Prvek | Selektor | Popis / Použití |
+| :--- | :--- | :--- |
+| **Kalkulačka** | `a[href*="kalkulacka"]` | Odkaz na kalkulačku |
+| **Testovací login** | `a[href*="login_app"]` | Odkaz na aplikaci testovacího loginu |
+| **NextDate** | `a[href*="nextdate"]` | Odkaz na aplikaci NextDate |
+| **Registrace na kurz** | `a[href*="regkurz/"]` | Odkaz na formulář registrace |
+| **Výpis registrací** | `a[href*="list.php"]` | Odkaz na výpis registrací |
+| **Demo-login** | `a[href*="courses"]` | Výrazný odkaz pro vstup do katalogu kurzů |

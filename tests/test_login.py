@@ -151,3 +151,22 @@ class TestLogin:
         assert reg_page.password_input.is_visible(), "Password input should be visible on /register"
         assert reg_page.password_confirmation_input.is_visible(), "Password confirmation should be visible"
 
+    def test_login_case_insensitive_and_trimmed_email(self, page, lector_credentials):
+        """
+        LOG-08 (US-03): Přihlášení s velkými písmeny a mezerami v emailu.
+        Akceptační kritérium US-03:
+        'Zadaný e-mail je tolerantní k velikosti písmen (case-insensitive)
+        a systém automaticky ořezává mezery před a za adresou.'
+        Kontroly:
+        1. Zadání '  LECTOR@LECTOR.COM  '.
+        2. Úspěšné přihlášení a přesměrování do systému.
+        3. Ověření přihlášeného stavu v navigaci.
+        """
+        spaced_upper_email = f"  {lector_credentials['email'].upper()}  "
+        login_page = LoginPage(page).open()
+        login_page.login(spaced_upper_email, lector_credentials["password"])
+
+        courses_page = CoursesPage(page)
+        assert courses_page.is_logged_in(), "Uživatel musí být úspěšně přihlášen i při zadání velkých písmen a mezer v emailu"
+
+

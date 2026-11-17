@@ -179,3 +179,29 @@ class TestRegistration:
         assert login_page.email_input.is_visible(), "Email input should be visible on /login"
         assert login_page.password_input.is_visible(), "Password input should be visible on /login"
 
+    def test_registration_duplicate_email_case_insensitive(self, page, lector_credentials):
+        """
+        REG-08 (US-02): Unikátnost emailu je necitlivá na velikost písmen a mezery.
+        Akceptační kritérium US-02:
+        'Zadaný e-mail je před validací normalizován (odstranění mezer na začátku a konci)
+        a systém je při ověřování unikátnosti necitlivý na velikost písmen.'
+        Kontroly:
+        1. Pokus o registraci s '  LECTOR@LECTOR.COM  '.
+        2. Chybová hláška 'The email has already been taken.'.
+        3. Uživatel není zaregistrován a zůstává nepřihlášen.
+        """
+        spaced_upper_email = f"  {lector_credentials['email'].upper()}  "
+        reg_page = RegisterPage(page).open()
+        reg_page.register(
+            name="Duplicitni User",
+            email=spaced_upper_email,
+            password="Heslo1234!",
+            password_confirmation="Heslo1234!"
+        )
+
+        assert "/register" in page.url
+        errors = reg_page.get_error_texts()
+        assert "The email has already been taken." in errors, f"Očekávána chyba duplicity emailu, získáno: {errors}"
+        assert reg_page.is_logged_out(), "Uživatel nesmí být přihlášen"
+
+

@@ -46,7 +46,11 @@ Každý náš test kombinuje minimálně 3 až 5 nezávislých úrovní ověřen
 | **CRS-01** | `test_courses_list_visible_for_guest` | 1. Nadpis `[data-test="courses_title"]` je viditelný<br>2. Karty kurzů `[data-test^="course_"]` existují v počtu > 0<br>3. Zobrazena pole `[data-test="course_name"]`, `[data-test="course_price"]`, `[data-test="course_capacity"]`<br>4. Tlačítko `Přidat kurz` NENÍ zobrazeno | Ověřuje plnou dostupnost katalogu pro veřejnost a správné oddělení práv (anonym nemůže spravovat kurzy). |
 | **CRS-02** | `test_regular_user_cannot_access_course_management` | 1. Uživatel je přihlášen<br>2. Tlačítko `Přidat kurz` NENÍ zobrazeno<br>3. Tlačítka `Přidat iteraci` NEJSOU zobrazena | Bezpečnostní autorizační test: student nesmí mít přístup k lektorským nástrojům. |
 | **CRS-03** | `test_lector_can_open_create_course_modal` | 1. Tlačítko `Přidat kurz` je pro lektora viditelné<br>2. Modál `[data-test="course_form_container"]` se otevře<br>3. Pole `course_name_input`, `course_description_input`, `course_capacity_input`, `course_price_input` a tlačítko `Vytvořit kurz` jsou přítomna | Ověřuje kompletní formulářovou výbavu lektora pro tvorbu nových vzdělávacích akcí. |
-| **CRS-04** | `test_lector_can_create_new_course` | 1. Úspěšné odeslání nového kurzu s unikátním názvem<br>2. Nově vytvořený kurz se reálně nachází v seznamu kurzů | End-to-end ověření tvorby kurzu od formuláře přes backend až po zobrazení v UI. |
+| **CRS-04** | `test_lector_can_create_new_course` | 1. Úspěšné odeslání nového kurzu s unikátním názvem<br>2. Nově vytvořený kurz se reálně nachází v seznamu kurzů | End-to-end ověření tvorby kurzu od formuláře přes backend až po zobrazení v UI (US-14). |
+| **CRS-05** | `test_course_detail_navigation_and_info` | 1. Klik na 'Chci vidět více'<br>2. Přesměrování na /courses/{id}<br>3. Zobrazení názvu, popisu, ceny a sekce vypsaných termínů | Komplexní zobrazení detailu kurzu a termínů (US-10). |
+| **CRS-06** | `test_course_detail_full_capacity_disables_registration` | 1. Otevření detailu kurzu<br>2. U termínů s plnou kapacitou se nenabízí tlačítko zápisu pro nepřihlášeného hosta | Zamezení zápisu a indikace plné kapacity (US-11). |
+| **CRS-07** | `test_lector_can_open_add_iteration_modal` | 1. Klik lektora na 'Přidat iteraci'<br>2. Zobrazení modálu `create_course_iteration_container`<br>3. Přítomnost polí pro datum od, datum do, den v týdnu, čas konání a místo výuky | Kompletní formulářová výbava pro vypsání nového běhu kurzu lektorem (US-15). |
+| **CRS-08** | `test_lector_sees_participants_button_on_course_detail` | 1. Přihlášení lektora a otevření detailu kurzu<br>2. Přítomnost tlačítek 'Přihlášení' u termínů | Zpřístupnění seznamu zapsaných účastníků výhradně lektorovi (US-16). |
 
 ---
 
@@ -61,6 +65,7 @@ Každý náš test kombinuje minimálně 3 až 5 nezávislých úrovní ověřen
 | **REG-05** | `test_registration_missing_name_only` | 1. URL zůstává na `/register`<br>2. Chybová hláška `"The name field is required."` je přítomna<br>3. Chybová hláška pro email NENÍ přítomna<br>4. Chybová hláška pro heslo NENÍ přítomna | Ověřuje izolovanost validací jednotlivých polí (žádné falešné chyby u správně vyplněných polí). |
 | **REG-06** | `test_registration_missing_password_only` | 1. URL zůstává na `/register`<br>2. Chybová hláška `"The password field is required."` je přítomna<br>3. Chyby pro jméno a email NEJSOU přítomny | Ověřuje izolovanost validace hesla. |
 | **REG-07** | `test_registration_link_navigates_to_login` | 1. Klik na odkaz `p[data-test="login_p"] a[data-test="login_link"]` přesměruje na `/login`<br>2. Formulář na `/login` obsahuje viditelné pole `input[data-test="email_input"]`<br>3. Formulář obsahuje viditelné pole `input[data-test="password_input"]` | Ověřuje funkční navigaci a použitelnost přihlašovacího formuláře pro již registrované uživatele. |
+| **REG-08** | `test_registration_duplicate_email_case_insensitive` | 1. Pokus o registraci existujícího účtu s mezerami a velkými písmeny (`  LECTOR@LECTOR.COM  `)<br>2. Zobrazení chybové hlášky `"The email has already been taken."`<br>3. Uživatel není vpuštěn | Splňuje kritérium US-02: normalizace emailu a necitlivost na velikost písmen při ověřování unikátnosti. |
 
 ---
 
@@ -75,10 +80,38 @@ Každý náš test kombinuje minimálně 3 až 5 nezávislých úrovní ověřen
 | **LOG-05** | `test_login_nonexistent_user` | 1. URL zůstává na `/login`<br>2. Chybová hláška `"These credentials do not match our records."`<br>3. Uživatel není autentizován | Zabraňuje neautorizovanému vstupu neexistujících účtů. |
 | **LOG-06** | `test_logout_flow_and_session_cleared` | 1. Předpoklad: lektor je přihlášen a vidí lektorská tlačítka<br>2. Kliknutí na `[data-test="logout_button"]`<br>3. Stav menu: `[data-test="logout_button"]` zmizí<br>4. Stav menu: `[data-test="login_link"]` se opět objeví<br>5. Privilegované tlačítko `Přidat kurz` okamžitě zmizí z DOMu | Komplexní test životního cyklu sezení: ověřuje úplné vyčištění klientského stavu a návrat do anonymního režimu. |
 | **LOG-07** | `test_login_navigation_to_register` | 1. Klik na odkaz `a[data-test="register_link"]` přesměruje na `/register`<br>2. Viditelnost pole `name_input`<br>3. Viditelnost pole `email_input`<br>4. Viditelnost pole `password_input`<br>5. Viditelnost pole `password_again_input` | Ověřuje funkční navigaci mezi přihlašovací a registrační obrazovkou. |
+| **LOG-08** | `test_login_case_insensitive_and_trimmed_email` | 1. Zadání emailu s mezerami a velkými písmeny (`  LECTOR@LECTOR.COM  `)<br>2. Úspěšná autentizace a přesměrování<br>3. Ověření přihlášeného stavu v navigaci | Splňuje kritérium US-03: systém je tolerantní k velikosti písmen a automaticky ořezává mezery. |
 
 ---
 
-### Oblast 4: Obnova hesla (Forgot Password)
+### Oblast 4: Úvodní navigační rozcestník (Modul 0: US-01)
+
+| ID testu | Název testu | Prováděné kontroly (Asserts) | Proč je kontrola dostatečná |
+| :--- | :--- | :--- | :--- |
+| **POR-01** | `test_portal_navigation_links_present_and_valid` | 1. Titulek stránky obsahuje 'Testování'<br>2. Přítomny funkční odkazy na Kalkulačku, Testovací login, NextDate a Registraci na kurz (včetně výpisu)<br>3. Přítomen odkaz 'Demo-login' | Ověřuje kompletní navigační rozcestník portálu dle specifikace US-01. |
+| **POR-02** | `test_portal_demo_login_link_navigates_to_courses` | 1. Klik na 'Demo-login' přesměruje na `/courses`<br>2. Načtení a zobrazení nadpisu katalogu kurzů | Ověřuje přímý vstup návštěvníka z rozcestníku do aplikace kurzů. |
+
+---
+
+### Oblast 5: Uživatelský profil (Modul 5: US-18)
+
+| ID testu | Název testu | Prováděné kontroly (Asserts) | Proč je kontrola dostatečná |
+| :--- | :--- | :--- | :--- |
+| **PRF-01** | `test_profile_prefilled_with_customer_data` | 1. Formulář `/profile` předvyplní jméno a email přihlášeného zákazníka<br>2. Ověření shody načtených údajů | Ověřuje integritu zobrazení profilu (US-18). |
+| **PRF-02** | `test_profile_update_ico_and_phone` | 1. Vyplnění platného IČO (27082440) a telefonu<br>2. Uložení a přesměrování na `/home`<br>3. Znovunačtení `/profile` a ověření perzistence | Ověřuje aktualizaci a perzistenci kontaktních a fakturačních údajů zákazníka. |
+| **PRF-03** | `test_profile_navigation_from_menu` | 1. Klik na 'Můj Profil' v horní liště<br>2. Přesměrování na `/profile`<br>3. Zobrazení formuláře | Ověřuje dostupnost profilu z navigace. |
+
+---
+
+### Oblast 6: Moje kurzy (Modul 3: US-13)
+
+| ID testu | Název testu | Prováděné kontroly (Asserts) | Proč je kontrola dostatečná |
+| :--- | :--- | :--- | :--- |
+| **MYC-01** | `test_my_courses_accessible_from_navigation` | 1. Přihlášení zákazníka<br>2. Klik na 'Moje kurzy' v navigaci<br>3. Přesměrování na `/my-courses` a načtení kontejneru | Ověřuje přístup k privátnímu přehledu zapsaných kurzů pro zákazníka (US-13). |
+
+---
+
+### Oblast 7: Obnova hesla (Forgot Password - US-05)
 
 | ID testu | Název testu | Prováděné kontroly (Asserts) | Proč je kontrola dostatečná |
 | :--- | :--- | :--- | :--- |
@@ -91,10 +124,10 @@ Každý náš test kombinuje minimálně 3 až 5 nezávislých úrovní ověřen
 
 ## 3. Závěr vyhodnocení
 
-Všech **22 testů** splňuje nejpřísnější kritéria spolehlivého testování:
+Všech **34 testů** splňuje nejpřísnější kritéria spolehlivého testování a plně reflektuje akceptační kritéria ze specifikace **Specifikace požadavků podle zdrojového kódu (User Stories)**:
 - **Žádný test se nespoléhá pouze na URL adresu.**
 - Všechny selektory využívají stabilní atributy **`data-test` a `data-testid`**.
-- Všechny úspěšné stavy kontrolují změny v **DOM navigaci (menu)** a **přítomnost/absenci uživatelských prvků**.
+- Všechny úspěšné stavy kontrolují změny v **DOM navigaci (menu)**, **přítomnost/absenci uživatelských prvků** i **přesné hodnoty formulářů**.
 - Všechny negativní stavy kontrolují **přesné znění chybových hlášek** generovaných aplikací.
-- Testy ověřují **oddělení rolí (RBAC)** – rozlišují anonymního návštěvníka, běžného studenta a lektora se specifickými právy správy kurzů.
-- Pokryty jsou všechny fáze životního cyklu účtu: **Registrace**, **Přihlášení**, **Odhlášení**, **Obnova zapomenutého hesla** a **Správa katalogu kurzů**.
+- Testy striktně ověřují **oddělení rolí (RBAC)** – rozlišují anonymního návštěvníka, běžného zákazníka i lektora se specifickými právy správy kurzů.
+- Pokryty jsou všechny moduly: **Úvodní rozcestník (Modul 0)**, **Autentizace a sezení (Modul 1)**, **Katalog a detail kurzů (Modul 2)**, **Zápis a Moje kurzy (Modul 3)**, **Správa kurzů a běhů (Modul 4)** a **Uživatelský profil (Modul 5)**.

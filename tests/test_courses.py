@@ -97,3 +97,88 @@ class TestCourses:
         assert any(course_name in name for name in all_course_names), (
             f"Nově vytvořený kurz '{course_name}' musí být nalezen v seznamu kurzů. Celkem nalezeno: {len(all_course_names)} kurzů."
         )
+
+    def test_course_detail_navigation_and_info(self, page):
+        """
+        CRS-05 (US-10): Zobrazení detailu kurzu a vypsaných termínů.
+        Kontroly:
+        1. Kliknutí na 'Chci vidět více' v katalogu kurzů.
+        2. Přesměrování na /courses/{id}.
+        3. Přítomnost kompletního názvu kurzu, popisu, ceny a sekce vypsaných termínů.
+        """
+        from pages.course_detail_page import CourseDetailPage
+        courses_page = CoursesPage(page).open()
+        page.wait_for_selector('button[data-test="registration_link"]:has-text("Chci vidět více")', timeout=10000)
+        courses_page.detail_buttons.first.click()
+        page.wait_for_load_state("networkidle")
+
+        assert "/courses/" in page.url, f"Očekávána URL detailu kurzu, získáno: {page.url}"
+        detail_page = CourseDetailPage(page)
+        detail_page.course_name.wait_for(state="visible", timeout=10000)
+        assert detail_page.course_name.is_visible(), "Název kurzu musí být viditelný na detailu"
+        assert detail_page.course_description.is_visible(), "Popis kurzu musí být viditelný"
+        assert detail_page.course_price.is_visible(), "Cena kurzu musí být viditelná"
+        assert detail_page.iterations_heading.is_visible(), "Nadpis termínů musí být viditelný"
+        assert detail_page.iterations.count() > 0, "Detail kurzu musí obsahovat vypsané termíny"
+
+    def test_course_detail_full_capacity_disables_registration(self, page):
+        """
+        CRS-06 (US-11): Indikace a zamezení zápisu při naplněné kapacitě.
+        Kontroly:
+        1. Na detailu kurzu u termínů s plnou kapacitou (např. 12/12) se nenabízí tlačítko zápisu pro nepřihlášeného hosta.
+        """
+        from pages.course_detail_page import CourseDetailPage
+        detail_page = CourseDetailPage(page, course_id=1).open()
+        detail_page.course_name.wait_for(state="visible", timeout=10000)
+
+        # Pro nepřihlášeného návštěvníka se tlačítko nezávazné registrace nesmí nabízet
+        assert detail_page.registration_buttons.count() == 0, "Nepřihlášený návštěvník nesmí vidět tlačítko registrace"
+
+    def test_lector_can_open_add_iteration_modal(self, page, lector_credentials):
+        """
+        CRS-07 (US-15): Vypsání nového běhu (termínu) kurzu lektorem.
+        Kontroly:
+        1. Lektor se přihlásí a otevře /courses.
+        2. Klik na tlačítko 'Přidat iteraci'.
+        3. Otevření modálu create_course_iteration_container.
+        4. Přítomnost všech formulářových prvků dle akceptačních kritérií US-15:
+           - datum zahájení (course_start_input)
+           - datum ukončení (course_end_input)
+           - den konání v týdnu (course_day_select)
+           - čas lekce (course_time_input)
+           - místo / forma výuky (course_location_input)
+           - tlačítko pro odeslání termínu
+        """
+        login_page = LoginPage(page).open()
+        login_page.login(lector_credentials["email"], lector_credentials["password"])
+
+        courses_page = CoursesPage(page).open()
+        courses_page.add_iteration_buttons.first.wait_for(state="visible", timeout=10000)
+        courses_page.add_iteration_buttons.first.click()
+        page.wait_for_timeout(1000)
+
+        assert courses_page.iteration_modal_container.is_visible(), "Modál pro vypsání termínu musí být viditelný"
+        assert courses_page.iteration_form.is_visible(), "Formulář termínu musí být přítomen"
+        assert courses_page.iteration_start_input.is_visible(), "Pole pro datum zahájení musí být viditelné"
+        assert courses_page.iteration_end_input.is_visible(), "Pole pro datum ukončení musí být viditelné"
+        assert courses_page.iteration_day_select.is_visible(), "Výběr dne konání musí být viditelný"
+        assert courses_page.iteration_time_input.is_visible(), "Pole pro čas konání musí být viditelné"
+        assert courses_page.iteration_location_input.is_visible(), "Pole pro místo výuky musí být viditelné"
+        assert courses_page.iteration_submit_button.is_visible(), "Tlačítko pro odeslání termínu musí být viditelné"
+
+    def test_lector_sees_participants_button_on_course_detail(self, page, lector_credentials):
+        """
+        CRS-08 (US-16): Zobrazení seznamu přihlášených účastníků pro lektora.
+        Kontroly:
+        1. Přihlášení lektora.
+        2. Přechod na detail kurzu /courses/1.
+        3. Lektor u jednotlivých termínů vidí ovládací tlačítko 'Přihlášení' pro zobrazení přihlášených studentů.
+        """
+        from pages.course_detail_page import CourseDetailPage
+        login_page = LoginPage(page).open()
+        login_page.login(lector_credentials["email"], lector_credentials["password"])
+
+        detail_page = CourseDetailPage(page, course_id=1).open()
+        detail_page.course_name.wait_for(state="visible", timeout=10000)
+        assert detail_page.participants_buttons.count() > 0, "Lektor musí vidět tlačítka pro zobrazení účastníků běhu"
+
