@@ -32,7 +32,10 @@ def registruj_uzivatele():
             page.locator('input[placeholder="Heslo"]').fill(heslo)
             page.locator('input[placeholder="Heslo znovu"]').fill(heslo)
             page.locator('button[type="submit"]').click()
-            page.wait_for_timeout(2500)
+            try:
+                page.locator('text=Odhlásit se').wait_for(state="visible", timeout=10000)
+            except Exception:
+                page.wait_for_load_state("networkidle")
 
             # Ověření úspěšné registrace
             if "/home" in page.url or page.locator("text=Odhlásit se").is_visible():

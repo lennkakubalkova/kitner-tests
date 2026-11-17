@@ -140,9 +140,9 @@ class TestLogin:
         """
         login_page = LoginPage(page).open()
         login_page.register_link.click()
-        page.wait_for_timeout(1000)
-
         reg_page = RegisterPage(page)
+        reg_page.name_input.wait_for(state="visible", timeout=5000)
+
         assert "/register" in page.url, f"Expected URL /register, but got {page.url}"
         assert reg_page.name_input.is_visible(), "Name input should be visible on /register"
         assert reg_page.email_input.is_visible(), "Email input should be visible on /register"

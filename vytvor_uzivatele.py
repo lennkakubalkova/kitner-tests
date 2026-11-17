@@ -33,7 +33,10 @@ def vytvor_skutecneho_uzivatele():
         # 3. Krok: Kliknutí na tlačítko Registrovat
         print("3. Odesílám registraci kliknutím na 'Registrovat'...")
         page.locator('button[type="submit"]').click()
-        page.wait_for_timeout(3000)
+        try:
+            page.locator('text=Odhlásit se').wait_for(state="visible", timeout=10000)
+        except Exception:
+            page.wait_for_load_state("networkidle")
 
         # 4. Krok: Ověření v aplikaci po registraci
         print(f"\n4. Aktuální URL po registraci: {page.url}")
@@ -44,7 +47,10 @@ def vytvor_skutecneho_uzivatele():
         # 5. Krok: Odhlášení a znovupřihlášení pro 100% důkaz funkčnosti účtu
         print("\n7. Odhlašuji nového uživatele...")
         page.locator('text=Odhlásit se').click()
-        page.wait_for_timeout(2000)
+        try:
+            page.locator('text=Přihlásit se').wait_for(state="visible", timeout=10000)
+        except Exception:
+            page.wait_for_load_state("networkidle")
         print(f"   URL po odhlášení: {page.url}")
 
         print("8. Zkouším se znovu přihlásit s čerstvě vytvořeným účtem...")
@@ -52,7 +58,10 @@ def vytvor_skutecneho_uzivatele():
         page.locator("#email_input").fill(email)
         page.locator("#password_input").fill(heslo)
         page.locator('button[type="submit"]').click()
-        page.wait_for_timeout(2000)
+        try:
+            page.locator('text=Odhlásit se').wait_for(state="visible", timeout=10000)
+        except Exception:
+            page.wait_for_load_state("networkidle")
 
         print(f"9. URL po úspěšném přihlášení: {page.url}")
         print(f"10. Je uživatel opět v menu přihlášen? {page.locator('text=Odhlásit se').is_visible()}")

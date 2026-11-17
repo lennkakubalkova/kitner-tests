@@ -46,4 +46,7 @@ class RegisterPage(BasePage):
             self.password_confirmation_input.clear()
 
         self.submit_button.click()
-        self.page.wait_for_timeout(1500)
+        try:
+            self.page.locator('li[data-test="navigation_logout_item"], span[data-test*="errors"], .text-error_clr').first.wait_for(state="visible", timeout=5000)
+        except Exception:
+            self.page.wait_for_load_state("networkidle")

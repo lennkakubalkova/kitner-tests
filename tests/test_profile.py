@@ -40,7 +40,10 @@ class TestProfile:
         profile_page.update_profile(ico=ProfileData.VALID_ICO, phone=ProfileData.VALID_PHONE)
 
         # Podle specifikace US-18 je uživatel po uložení přesměrován na domovskou stránku
-        page.wait_for_timeout(1000)
+        try:
+            page.wait_for_url("**/home*", timeout=5000)
+        except Exception:
+            page.wait_for_load_state("networkidle")
         assert "/home" in page.url or "/profile" in page.url, f"Očekáváno přesměrování po uložení, získáno: {page.url}"
 
         # Ověření perzistence dat v profilu

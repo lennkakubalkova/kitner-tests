@@ -29,7 +29,10 @@ class ForgotPasswordPage(BasePage):
         else:
             self.email_input.clear()
         self.submit_button.click()
-        self.page.wait_for_timeout(1000)
+        try:
+            self.page.locator('div[data-test="status_div"], span[data-test="email_input_errors"], .text-error_clr').first.wait_for(state="visible", timeout=5000)
+        except Exception:
+            self.page.wait_for_load_state("networkidle")
 
     def get_error_message(self) -> str:
         """Return the validation error text displayed under the email input."""

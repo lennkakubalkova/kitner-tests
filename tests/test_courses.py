@@ -55,7 +55,7 @@ class TestCourses:
         assert courses_page.add_course_button.is_visible(), "Lektor musí vidět tlačítko Přidat kurz"
 
         courses_page.add_course_button.click()
-        page.wait_for_timeout(1000)
+        courses_page.modal_container.wait_for(state="visible", timeout=5000)
 
         assert courses_page.modal_container.is_visible(), "Modální okno musí být zobrazeno"
         assert courses_page.modal_name_input.is_visible(), "Pole pro název kurzu musí být viditelné"
@@ -86,8 +86,7 @@ class TestCourses:
 
         # Ověření, že nový kurz byl vytvořen a nachází se v přehledu kurzů
         courses_page.open()
-        page.wait_for_selector('h2[data-test="course_name"]', timeout=10000)
-        page.wait_for_timeout(1000)
+        courses_page.course_names.first.wait_for(state="visible", timeout=10000)
         all_course_names = [el.inner_text().strip() for el in courses_page.course_names.all()]
         assert any(course_payload["name"] in name for name in all_course_names), (
             f"Nově vytvořený kurz '{course_payload['name']}' musí být nalezen v seznamu kurzů. Celkem nalezeno: {len(all_course_names)} kurzů."
@@ -148,7 +147,7 @@ class TestCourses:
         courses_page = CoursesPage(page).open()
         courses_page.add_iteration_buttons.first.wait_for(state="visible", timeout=10000)
         courses_page.add_iteration_buttons.first.click()
-        page.wait_for_timeout(1000)
+        courses_page.iteration_modal_container.wait_for(state="visible", timeout=5000)
 
         assert courses_page.iteration_modal_container.is_visible(), "Modál pro vypsání termínu musí být viditelný"
         assert courses_page.iteration_form.is_visible(), "Formulář termínu musí být přítomen"

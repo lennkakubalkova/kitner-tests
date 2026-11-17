@@ -40,11 +40,17 @@ class BasePage:
         return self.nav_login.is_visible() and not self.nav_logout.is_visible()
 
     def logout(self):
-        """Click logout button and wait for redirect."""
+        """Click logout button and wait for redirect to logged out state."""
         self.nav_logout.click()
-        self.page.wait_for_timeout(1000)
+        try:
+            self.nav_login.wait_for(state="visible", timeout=Config.DEFAULT_TIMEOUT)
+        except Exception:
+            self.page.wait_for_load_state("networkidle")
 
     def get_error_texts(self) -> list[str]:
         """Returns all currently visible error message strings on the page."""
-        self.page.wait_for_timeout(500)
+        try:
+            self.error_messages.first.wait_for(state="visible", timeout=3000)
+        except Exception:
+            pass
         return [el.inner_text().strip() for el in self.error_messages.all() if el.is_visible()]

@@ -1,4 +1,5 @@
 from playwright.sync_api import Page
+from config.config import Config
 from pages.base_page import BasePage
 
 class CoursesPage(BasePage):
@@ -55,10 +56,13 @@ class CoursesPage(BasePage):
     def create_course(self, name: str, description: str, capacity: int, price: int):
         """Opens modal and creates a new course."""
         self.add_course_button.click()
-        self.page.wait_for_timeout(1000)
+        self.modal_name_input.wait_for(state="visible", timeout=Config.DEFAULT_TIMEOUT)
         self.modal_name_input.fill(name)
         self.modal_description_input.fill(description)
         self.modal_capacity_input.fill(str(capacity))
         self.modal_price_input.fill(str(price))
         self.modal_submit_button.click()
-        self.page.wait_for_timeout(2000)
+        try:
+            self.modal_container.wait_for(state="hidden", timeout=Config.DEFAULT_TIMEOUT)
+        except Exception:
+            self.page.wait_for_load_state("networkidle")

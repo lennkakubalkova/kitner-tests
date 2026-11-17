@@ -36,7 +36,10 @@ class ProfilePage(BasePage):
         if phone is not None:
             self.phone_input.fill(phone)
         self.save_button.click()
-        self.page.wait_for_timeout(1500)
+        try:
+            self.page.wait_for_url("**/home*", timeout=5000)
+        except Exception:
+            self.page.wait_for_load_state("networkidle")
 
     def get_values(self) -> dict:
         """Return currently loaded input values in profile."""

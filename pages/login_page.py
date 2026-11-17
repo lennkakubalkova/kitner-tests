@@ -41,7 +41,10 @@ class LoginPage(BasePage):
             except Exception:
                 pass
         else:
-            self.page.wait_for_timeout(1000)
+            try:
+                self.page.locator('span[data-test*="errors"], .text-error_clr').first.wait_for(state="visible", timeout=4000)
+            except Exception:
+                self.page.wait_for_load_state("networkidle")
 
     def click_forgot_password(self):
         """Click on 'Zapomněli jste heslo?' link."""
