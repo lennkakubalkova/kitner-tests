@@ -13,6 +13,8 @@ class ForgotPasswordPage(BasePage):
         self.email_input = page.locator('input[data-test="email_input"], input[data-testid="email_input"]')
         self.submit_button = page.locator('button[data-test="submit_button"], button[data-testid="submit_button"]')
         self.email_error = page.locator('span[data-test="email_input_errors"], span[data-testid="email_input_errors"]')
+        self.status_message = page.locator('div[data-test="status_div"], div[data-testid="status_div"]')
+
 
     def open(self):
         """Navigate directly to the forgot password page."""
@@ -36,6 +38,15 @@ class ForgotPasswordPage(BasePage):
             return self.email_error.inner_text().strip()
         except Exception:
             return ""
+
+    def get_status_message(self) -> str:
+        """Return the confirmation message displayed after submitting reset request."""
+        try:
+            self.status_message.wait_for(state="visible", timeout=10000)
+            return self.status_message.inner_text().strip()
+        except Exception:
+            return ""
+
 
     def is_form_visible(self) -> bool:
         """Check if essential form components are visible."""

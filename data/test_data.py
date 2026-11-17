@@ -10,6 +10,11 @@ class ErrorMessages:
     RATE_LIMIT_WAIT = "Please wait before retrying."
 
 
+class StatusMessages:
+    """Expected success and status notification messages."""
+    RESET_PASSWORD_SUCCESS = "We have emailed your password reset link!"
+
+
 class UserData:
     """Static and template user data for testing."""
     DEFAULT_PASSWORD = "ValidPassword123!"

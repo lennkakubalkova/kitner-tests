@@ -98,6 +98,7 @@ Všechny Page Objecty v projektu byly refaktorovány tak, aby primárně využí
 | **Tlačítko Potvrdit** | `button[data-test="submit_button"]` | Odeslání formuláře pro reset hesla |
 | **Chybová zpráva** | `span[data-test="email_input_errors"]` | Validační zpráva (povinné pole, neexistující uživatel, limit) |
 | **Kontejner chyb** | `div[data-test="email_input_errors_div"]` | Kontejner chybových hlášek pod inputem |
+| **Potvrzovací zpráva úspěchu** | `div[data-test="status_div"]` | Zpráva „We have emailed your password reset link!“ |
 | **Odkaz z přihlašovací stránky** | `a[data-test="forgot_password_link"]` | Odkaz „Zapomněli jste heslo?“ na `/login` |
 
 ---
