@@ -38,10 +38,10 @@ TEST_LIST = [
     ("REG-08", "tests/test_registration.py::TestRegistration::test_registration_duplicate_email_case_insensitive"),
 
     # Modul 1: Obnova hesla - US-05
-    ("RST-01", "tests/test_forgot_password.py::test_navigation_from_login_to_forgot_password"),
-    ("RST-02", "tests/test_forgot_password.py::test_forgot_password_empty_email_validation"),
-    ("RST-03", "tests/test_forgot_password.py::test_forgot_password_nonexistent_email_validation"),
-    ("RST-04", "tests/test_forgot_password.py::test_forgot_password_registered_user_submission"),
+    ("RST-01", "tests/test_forgot_password.py::TestForgotPassword::test_navigation_from_login_to_forgot_password"),
+    ("RST-02", "tests/test_forgot_password.py::TestForgotPassword::test_forgot_password_empty_email_validation"),
+    ("RST-03", "tests/test_forgot_password.py::TestForgotPassword::test_forgot_password_nonexistent_email_validation"),
+    ("RST-04", "tests/test_forgot_password.py::TestForgotPassword::test_forgot_password_registered_user_submission"),
 
     # Modul 5: Uživatelský profil - US-18
     ("PRF-01", "tests/test_profile.py::TestProfile::test_profile_prefilled_with_customer_data"),

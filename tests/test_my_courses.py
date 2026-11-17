@@ -1,7 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-from pages.login_page import LoginPage
-from pages.my_courses_page import MyCoursesPage
+from pages import LoginPage, MyCoursesPage
 
 class TestMyCourses:
     """Test suite for Modul 3: Zápis a Moje kurzy (US-13)."""

@@ -16,10 +16,22 @@ Sada automatizovaných E2E testů vytvořená v **Pythonu** pomocí **pytest** a
   - **Modul 5 (Uživatelský profil a nástěnka - US-17, US-18):** 3 testy (`PRF-01` až `PRF-03`)
 - **Úspěšnost:** 34 / 34 PASSED (100 %)
 
-## Struktura souborů
+## Struktura projektu
+
+Projekt využívá čistou a škálovatelnou enterprise architekturu testovací automatizace rozdělenou do logických vrstev:
 
 ```
-├── pages/
+├── config/                   # Centrální konfigurace projektu
+│   ├── __init__.py
+│   └── config.py             # URL, timeouty, nastavení prohlížeče, přihlašovací účty
+├── data/                     # Testovací data a chybové hlášky
+│   ├── __init__.py
+│   └── test_data.py          # Validační hlášky (ErrorMessages), šablony uživatelů, kurzů a profilu
+├── utils/                    # Pomocné funkce a utility
+│   ├── __init__.py
+│   └── helpers.py            # Generátory unikátních dat, kontrolní součet IČO (modulo 11)
+├── pages/                    # Page Object Model (POM) s data-test lokátory
+│   ├── __init__.py
 │   ├── base_page.py          # Společná logika navigace a menu (navbar) s data-test lokátory
 │   ├── portal_page.py        # Page Object pro úvodní rozcestník (US-01)
 │   ├── login_page.py         # Page Object pro přihlášení (/login) s data-test lokátory
@@ -30,8 +42,9 @@ Sada automatizovaných E2E testů vytvořená v **Pythonu** pomocí **pytest** a
 │   ├── profile_page.py       # Page Object pro uživatelský profil (/profile)
 │   ├── my_courses_page.py    # Page Object pro přehled mých kurzů (/my-courses)
 │   └── home_page.py          # Page Object pro uvítací nástěnku uživatele (/home)
-├── tests/
-│   ├── conftest.py           # Fixtury Playwright, session autentizace a reálná registrace
+├── tests/                    # Automatizované testy (pytest)
+│   ├── __init__.py
+│   ├── conftest.py           # Fixtury Playwright napojené na config, data a pages
 │   ├── test_portal.py        # 2 testy úvodního rozcestníku (Modul 0)
 │   ├── test_courses.py       # 8 testů katalogu, detailu kurzu, oprávnění lektora a tvorby kurzů/termínů
 │   ├── test_login.py         # 8 testů přihlášení, odhlášení, normalizace emailu a autorizace

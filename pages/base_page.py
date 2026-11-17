@@ -1,9 +1,11 @@
 from playwright.sync_api import Page, expect
+from config.config import Config
 
 class BasePage:
     """Base class for all page objects, providing standard navigation and assertion helpers using data-test/data-testid."""
     
-    BASE_URL = "http://testovani.kitner.cz"
+    BASE_URL = Config.BASE_URL
+
     
     def __init__(self, page: Page):
         self.page = page

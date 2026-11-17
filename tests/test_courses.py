@@ -1,7 +1,6 @@
-import time
 import pytest
-from pages.courses_page import CoursesPage
-from pages.login_page import LoginPage
+from pages import CoursesPage, CourseDetailPage, LoginPage
+from utils.helpers import generate_course_data
 
 class TestCourses:
     """Test suite for the Courses catalog and Course management functionality using data-test/data-testid."""
@@ -72,21 +71,17 @@ class TestCourses:
         1. Vyplnění a odeslání kurzu s unikátním názvem.
         2. Ověření, že nový kurz se objevil v přehledu kurzů na stránce.
         """
-        ts = int(time.time())
-        course_name = f"QA Kurz {ts}"
-        course_desc = "Komplexni kurz automatizace testovani s Playwright a pytest."
-        course_capacity = 16
-        course_price = 3990
+        course_payload = generate_course_data()
 
         login_page = LoginPage(page).open()
         login_page.login(lector_credentials["email"], lector_credentials["password"])
 
         courses_page = CoursesPage(page).open()
         courses_page.create_course(
-            name=course_name,
-            description=course_desc,
-            capacity=course_capacity,
-            price=course_price
+            name=course_payload["name"],
+            description=course_payload["description"],
+            capacity=course_payload["capacity"],
+            price=course_payload["price"]
         )
 
         # Ověření, že nový kurz byl vytvořen a nachází se v přehledu kurzů
@@ -94,8 +89,8 @@ class TestCourses:
         page.wait_for_selector('h2[data-test="course_name"]', timeout=10000)
         page.wait_for_timeout(1000)
         all_course_names = [el.inner_text().strip() for el in courses_page.course_names.all()]
-        assert any(course_name in name for name in all_course_names), (
-            f"Nově vytvořený kurz '{course_name}' musí být nalezen v seznamu kurzů. Celkem nalezeno: {len(all_course_names)} kurzů."
+        assert any(course_payload["name"] in name for name in all_course_names), (
+            f"Nově vytvořený kurz '{course_payload['name']}' musí být nalezen v seznamu kurzů. Celkem nalezeno: {len(all_course_names)} kurzů."
         )
 
     def test_course_detail_navigation_and_info(self, page):
@@ -106,7 +101,6 @@ class TestCourses:
         2. Přesměrování na /courses/{id}.
         3. Přítomnost kompletního názvu kurzu, popisu, ceny a sekce vypsaných termínů.
         """
-        from pages.course_detail_page import CourseDetailPage
         courses_page = CoursesPage(page).open()
         page.wait_for_selector('button[data-test="registration_link"]:has-text("Chci vidět více")', timeout=10000)
         courses_page.detail_buttons.first.click()
@@ -127,7 +121,6 @@ class TestCourses:
         Kontroly:
         1. Na detailu kurzu u termínů s plnou kapacitou (např. 12/12) se nenabízí tlačítko zápisu pro nepřihlášeného hosta.
         """
-        from pages.course_detail_page import CourseDetailPage
         detail_page = CourseDetailPage(page, course_id=1).open()
         detail_page.course_name.wait_for(state="visible", timeout=10000)
 
@@ -174,7 +167,6 @@ class TestCourses:
         2. Přechod na detail kurzu /courses/1.
         3. Lektor u jednotlivých termínů vidí ovládací tlačítko 'Přihlášení' pro zobrazení přihlášených studentů.
         """
-        from pages.course_detail_page import CourseDetailPage
         login_page = LoginPage(page).open()
         login_page.login(lector_credentials["email"], lector_credentials["password"])
 

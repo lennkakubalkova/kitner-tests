@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
-from pages.login_page import LoginPage
-from pages.profile_page import ProfilePage
+from pages import LoginPage, ProfilePage
+from data.test_data import ProfileData
 
 class TestProfile:
     """Test suite for Modul 5: Uživatelský profil a domovská nástěnka (US-18)."""
@@ -37,7 +37,7 @@ class TestProfile:
         login_page.login(registered_user["email"], registered_user["password"])
 
         profile_page = ProfilePage(page).open()
-        profile_page.update_profile(ico="27082440", phone="777123456")
+        profile_page.update_profile(ico=ProfileData.VALID_ICO, phone=ProfileData.VALID_PHONE)
 
         # Podle specifikace US-18 je uživatel po uložení přesměrován na domovskou stránku
         page.wait_for_timeout(1000)
@@ -46,8 +46,8 @@ class TestProfile:
         # Ověření perzistence dat v profilu
         profile_page.open()
         vals = profile_page.get_values()
-        assert vals["ico"] == "27082440", f"IČO musí být trvale uloženo, získáno: '{vals['ico']}'"
-        assert vals["phone"] == "777123456", f"Telefon musí být trvale uložen, získáno: '{vals['phone']}'"
+        assert vals["ico"] == ProfileData.VALID_ICO, f"IČO musí být trvale uloženo, získáno: '{vals['ico']}'"
+        assert vals["phone"] == ProfileData.VALID_PHONE, f"Telefon musí být trvale uložen, získáno: '{vals['phone']}'"
 
     def test_profile_navigation_from_menu(self, page: Page, registered_user):
         """

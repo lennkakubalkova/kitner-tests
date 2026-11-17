@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-from pages.portal_page import PortalPage
+from pages import PortalPage
 
 class TestPortal:
     """Test suite for Modul 0: Úvodní navigační rozcestník (US-01)."""

@@ -1,65 +1,60 @@
-import time
 import pytest
 from playwright.sync_api import sync_playwright
+from config.config import Config
+from pages.register_page import RegisterPage
+from utils.helpers import generate_user_data
 
 @pytest.fixture(scope="session")
 def playwright_instance():
+    """Initializes Playwright runtime for the test session."""
     with sync_playwright() as p:
         yield p
 
 @pytest.fixture(scope="session")
 def browser(playwright_instance):
+    """Launches the shared browser instance using central configuration."""
     browser = playwright_instance.chromium.launch(
-        headless=True,
-        args=["--disable-dev-shm-usage", "--no-sandbox"]
+        headless=Config.HEADLESS,
+        args=Config.BROWSER_ARGS
     )
     yield browser
     browser.close()
 
 @pytest.fixture(scope="function")
 def page(browser):
-    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    """Creates a new isolated browser context and page for each test."""
+    context = browser.new_context(viewport=Config.VIEWPORT)
     page = context.new_page()
+    page.set_default_timeout(Config.DEFAULT_TIMEOUT)
     yield page
     context.close()
 
 @pytest.fixture(scope="session")
 def lector_credentials():
-    return {
-        "email": "lector@lector.com",
-        "password": "lector@lector.com"
-    }
+    """Returns official lector credentials from central configuration."""
+    return Config.LECTOR_CREDENTIALS
 
 @pytest.fixture(scope="session")
 def registered_user(browser):
     """
     Session fixture that registers a genuine new user in the application
-    as requested in the task conditions, and provides their credentials.
+    using the Page Object Model (RegisterPage) and genuine form submission.
     """
-    context = browser.new_context()
+    context = browser.new_context(viewport=Config.VIEWPORT)
     page = context.new_page()
-    ts = int(time.time() * 1000)
-    user_data = {
-        "name": f"Tester Real {ts}",
-        "email": f"tester_real_{ts}@testkitner.cz",
-        "password": "ValidPassword123!"
-    }
-    
-    page.goto("http://testovani.kitner.cz/register")
-    page.wait_for_load_state("networkidle")
-    page.locator('input[placeholder="Jméno"]').fill(user_data["name"])
-    page.locator('input[placeholder="Email"]').fill(user_data["email"])
-    page.locator('input[placeholder="Heslo"]').fill(user_data["password"])
-    page.locator('input[placeholder="Heslo znovu"]').fill(user_data["password"])
-    page.locator('button[type="submit"]').click()
-    page.wait_for_timeout(2000)
-    
-    # Log out to leave user in clean state for login tests
-    logout_btn = page.locator('text=Odhlásit se')
-    if logout_btn.is_visible():
-        logout_btn.click()
-        page.wait_for_timeout(1000)
-        
+    user_data = generate_user_data(name_prefix="Tester Real")
+
+    reg_page = RegisterPage(page).open()
+    reg_page.register(
+        name=user_data["name"],
+        email=user_data["email"],
+        password=user_data["password"],
+        password_confirmation=user_data["password_confirmation"]
+    )
+
+    # Log out to leave user in clean state for subsequent tests
+    if reg_page.is_logged_in():
+        reg_page.logout()
+
     context.close()
     return user_data
-

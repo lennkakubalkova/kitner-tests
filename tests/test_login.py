@@ -1,14 +1,14 @@
 import pytest
-from pages.login_page import LoginPage
-from pages.courses_page import CoursesPage
-from pages.register_page import RegisterPage
+from pages import LoginPage, CoursesPage, RegisterPage
+from data.test_data import ErrorMessages, UserData
+from utils.helpers import generate_unique_email
 
 class TestLogin:
     """Test suite for the Login and Session management of Demo login application."""
 
     def test_login_lector_success_and_privileges(self, page, lector_credentials):
         """
-        LOG-01: Successful login with lector account.
+        LOG-01 (US-03, US-19): Successful login with lector account.
         Checks:
         1. Redirection to /courses.
         2. In menu: 'Odhlásit se' is visible, 'Přihlásit se' is absent.
@@ -20,10 +20,7 @@ class TestLogin:
         login_page.login(lector_credentials["email"], lector_credentials["password"])
 
         courses_page = CoursesPage(page)
-        # Check URL
         assert "/courses" in page.url, f"Expected URL /courses, but got {page.url}"
-
-        # Deep assertions on menu state
         assert courses_page.is_logged_in(), "Navbar must reflect logged in state (logout present, login absent)"
         assert courses_page.nav_profile.is_visible(), "Link 'Můj Profil' must be visible"
         assert courses_page.nav_my_courses.is_visible(), "Link 'Moje kurzy' must be visible"
@@ -35,7 +32,7 @@ class TestLogin:
 
     def test_login_registered_user_success(self, page, registered_user):
         """
-        LOG-02: Successful login with newly registered real user.
+        LOG-02 (US-03): Successful login with newly registered real user.
         Checks:
         1. User successfully logs in with real registered credentials.
         2. Redirection and menu state shows user is authenticated.
@@ -45,8 +42,8 @@ class TestLogin:
         login_page.login(registered_user["email"], registered_user["password"])
 
         courses_page = CoursesPage(page)
-        # User is logged in
-        assert courses_page.is_logged_in(), "Real registered user must be authenticated"
+        assert "/courses" in page.url, f"Expected URL /courses, but got {page.url}"
+        assert courses_page.is_logged_in(), "Navbar must indicate user is authenticated"
         assert courses_page.nav_profile.is_visible(), "Profile link must be visible for logged in user"
 
         # Check privilege boundary
@@ -56,7 +53,7 @@ class TestLogin:
 
     def test_login_empty_fields_validation(self, page):
         """
-        LOG-03: Submitting empty login form.
+        LOG-03 (US-03): Submitting empty login form.
         Checks:
         1. Form is rejected, URL remains on /login.
         2. Required field errors for email and password are both displayed.
@@ -67,49 +64,50 @@ class TestLogin:
 
         assert "/login" in page.url, f"Expected URL /login, but got {page.url}"
         errors = login_page.get_error_texts()
-        assert "The email field is required." in errors, f"Expected email required error in {errors}"
-        assert "The password field is required." in errors, f"Expected password required error in {errors}"
+        assert ErrorMessages.REQUIRED_EMAIL in errors, f"Expected email required error in {errors}"
+        assert ErrorMessages.REQUIRED_PASSWORD in errors, f"Expected password required error in {errors}"
         assert login_page.is_logged_out(), "Navbar must still show logged-out state"
 
     def test_login_invalid_password(self, page, lector_credentials):
         """
-        LOG-04: Existing user with incorrect password.
+        LOG-04 (US-03): Existing user with incorrect password.
         Checks:
         1. URL remains on /login.
         2. Exact authentication error message 'These credentials do not match our records.' appears.
         3. User is not authenticated; navbar shows 'Přihlásit se'.
         """
         login_page = LoginPage(page).open()
-        login_page.login(lector_credentials["email"], "IncorrectPassword999!")
+        login_page.login(lector_credentials["email"], UserData.INVALID_PASSWORD)
 
         assert "/login" in page.url, f"Expected to remain on /login, but got {page.url}"
         errors = login_page.get_error_texts()
-        assert "These credentials do not match our records." in errors, (
+        assert ErrorMessages.INVALID_CREDENTIALS in errors, (
             f"Expected invalid credentials error in {errors}"
         )
         assert login_page.is_logged_out(), "User must remain unauthenticated"
 
     def test_login_nonexistent_user(self, page):
         """
-        LOG-05: Non-existent email address and arbitrary password.
+        LOG-05 (US-03): Non-existent email address and arbitrary password.
         Checks:
         1. URL remains on /login.
         2. Exact error message 'These credentials do not match our records.' appears.
         3. User is not authenticated.
         """
+        nonexistent_email = generate_unique_email(prefix="nonexistent")
         login_page = LoginPage(page).open()
-        login_page.login("completely_nonexistent_tester_12345@testkitner.cz", "SomeSecret123!")
+        login_page.login(nonexistent_email, UserData.INVALID_PASSWORD)
 
         assert "/login" in page.url, f"Expected to remain on /login, but got {page.url}"
         errors = login_page.get_error_texts()
-        assert "These credentials do not match our records." in errors, (
+        assert ErrorMessages.INVALID_CREDENTIALS in errors, (
             f"Expected invalid credentials error in {errors}"
         )
         assert login_page.is_logged_out(), "User must remain unauthenticated"
 
     def test_logout_flow_and_session_cleared(self, page, lector_credentials):
         """
-        LOG-06: Complete logout flow.
+        LOG-06 (US-04): Complete logout flow.
         Checks:
         1. Lector logs in -> verifies logged in state and presence of privileged buttons.
         2. Lector clicks 'Odhlásit se'.
@@ -135,7 +133,7 @@ class TestLogin:
 
     def test_login_navigation_to_register(self, page):
         """
-        LOG-07: Navigation test - link 'Zaregistrujte se zde.' navigates from login to register.
+        LOG-07 (US-03): Navigation test - link 'Zaregistrujte se zde.' navigates from login to register.
         Checks:
         1. Click on register link redirects to /register.
         2. Registration form inputs (name, email, password, password confirmation) are visible.
@@ -168,5 +166,3 @@ class TestLogin:
 
         courses_page = CoursesPage(page)
         assert courses_page.is_logged_in(), "Uživatel musí být úspěšně přihlášen i při zadání velkých písmen a mezer v emailu"
-
-
