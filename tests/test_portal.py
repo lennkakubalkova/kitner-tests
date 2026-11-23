@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-from pages import PortalPage
+from pages import PortalPage, CoursesPage
 
 class TestPortal:
     """Test suite for Modul 0: Úvodní navigační rozcestník (US-01)."""
@@ -38,6 +38,6 @@ class TestPortal:
         page.wait_for_load_state("networkidle")
         
         assert "/courses" in page.url, f"Očekávána cílová adresa /courses, získáno: {page.url}"
-        courses_title = page.locator('h1[data-test="courses_title"]')
-        courses_title.wait_for(state="visible", timeout=10000)
-        assert courses_title.is_visible(), "Na stránce kurzů musí být viditelný nadpis Seznam kurzů"
+        courses_page = CoursesPage(page)
+        courses_page.courses_title.wait_for(state="visible", timeout=10000)
+        assert courses_page.courses_title.is_visible(), "Na stránce kurzů musí být viditelný nadpis Seznam kurzů"

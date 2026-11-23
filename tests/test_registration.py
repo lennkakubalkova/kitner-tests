@@ -194,3 +194,46 @@ class TestRegistration:
         errors = reg_page.get_error_texts()
         assert ErrorMessages.EMAIL_ALREADY_TAKEN in errors, f"Očekávána chyba duplicity emailu, získáno: {errors}"
         assert reg_page.is_logged_out(), "Uživatel nesmí být přihlášen"
+
+    def test_registration_invalid_email_format(self, page):
+        """
+        REG-09 (US01 / US-02): Validace nesprávného formátu e-mailu při registraci.
+        Kontroly:
+        1. Zadání neplatného formátu e-mailu ('neplatny_email_bez_zavinace').
+        2. Registrace je zamítnuta a uživatel zůstává na /register.
+        3. Uživatel není přihlášen.
+        """
+        reg_page = RegisterPage(page).open()
+        reg_page.register(
+            name="Invalid Email User",
+            email="neplatny_email_bez_zavinace",
+            password=UserData.DEFAULT_PASSWORD,
+            password_confirmation=UserData.DEFAULT_PASSWORD
+        )
+
+        assert "/register" in page.url, f"Očekáváno setrvání na /register, získáno: {page.url}"
+        assert reg_page.is_logged_out(), "Uživatel nesmí být přihlášen s neplatným formátem emailu"
+
+    def test_registration_empty_password_confirmation(self, page):
+        """
+        REG-10 (US01 / US-02): Validace prázdného pole 'Heslo znovu'.
+        Kontroly:
+        1. Vyplnění jména, unikátního e-mailu a hesla, ale pole 'Heslo znovu' zůstane prázdné.
+        2. Registrace je zamítnuta (zobrazí se chybová hláška pro neshodu/potvrzení hesla).
+        3. Uživatel zůstává nepřihlášen na /register.
+        """
+        email = generate_unique_email(prefix="noconfirm")
+        reg_page = RegisterPage(page).open()
+        reg_page.register(
+            name="No Confirm User",
+            email=email,
+            password=UserData.DEFAULT_PASSWORD,
+            password_confirmation=""
+        )
+
+        assert "/register" in page.url, f"Očekáváno setrvání na /register, získáno: {page.url}"
+        errors = reg_page.get_error_texts()
+        assert ErrorMessages.PASSWORD_CONFIRMATION_MISMATCH in errors, (
+            f"Očekávána chyba neshody/potvrzení hesla v {errors}"
+        )
+        assert reg_page.is_logged_out(), "Uživatel nesmí být přihlášen s nevyplněným potvrzením hesla"

@@ -62,12 +62,11 @@ class TestProfile:
         login_page = LoginPage(page).open()
         login_page.login(registered_user["email"], registered_user["password"])
 
-        profile_link = page.locator('li[data-test="navigation_profile_item"] a[data-test="courses_profile"]')
-        profile_link.wait_for(state="visible", timeout=10000)
-        profile_link.click()
+        profile_page = ProfilePage(page)
+        profile_page.nav_profile.wait_for(state="visible", timeout=10000)
+        profile_page.nav_profile.click()
         page.wait_for_load_state("networkidle")
 
         assert "/profile" in page.url, f"Očekávána URL /profile, získáno: {page.url}"
-        profile_page = ProfilePage(page)
         profile_page.form.wait_for(state="visible", timeout=10000)
         assert profile_page.form.is_visible(), "Formulář profilu musí být zobrazen"

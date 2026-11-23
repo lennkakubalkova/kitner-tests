@@ -16,12 +16,11 @@ class TestMyCourses:
         login_page = LoginPage(page).open()
         login_page.login(registered_user["email"], registered_user["password"])
 
-        my_courses_link = page.locator('a[data-test="courses_link"]:has-text("Moje kurzy")')
-        my_courses_link.wait_for(state="visible", timeout=10000)
-        my_courses_link.click()
+        my_courses_page = MyCoursesPage(page)
+        my_courses_page.nav_my_courses.wait_for(state="visible", timeout=10000)
+        my_courses_page.nav_my_courses.click()
         page.wait_for_load_state("networkidle")
 
         assert "/my-courses" in page.url, f"Očekávána URL /my-courses, získáno: {page.url}"
-        my_courses_page = MyCoursesPage(page)
         assert my_courses_page.page_container.is_visible(), "Kontejner stránky Moje kurzy musí být zobrazen"
 
