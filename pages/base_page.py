@@ -47,6 +47,13 @@ class BasePage:
         except Exception:
             self.page.wait_for_load_state("networkidle")
 
+    def perform_logout(self):
+        """Performs logout using web-first Playwright assertions without timeouts."""
+        expect(self.nav_logout).to_be_visible()
+        self.nav_logout.click()
+        expect(self.nav_login).to_be_visible()
+        expect(self.nav_logout).not_to_be_visible()
+
     def get_error_texts(self) -> list[str]:
         """Returns all currently visible error message strings on the page."""
         try:

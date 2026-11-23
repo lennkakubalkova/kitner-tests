@@ -36,3 +36,10 @@ class ProfileData:
     INVALID_ICO = "12345678"
     VALID_PHONE = "777123456"
 
+
+class LogoutData:
+    """Test data and expectations for user logout scenarios."""
+    LOGOUT_SUCCESS_URL_KEYWORD = "login"
+    EXPECTED_LOGIN_BUTTON_TEXT = "Přihlásit se"
+
+
