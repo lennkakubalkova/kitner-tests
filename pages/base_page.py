@@ -54,6 +54,12 @@ class BasePage:
         expect(self.nav_login).to_be_visible()
         expect(self.nav_logout).not_to_be_visible()
 
+    def click_home_navigation(self):
+        """Clicks Home link in navbar and waits for navigation to /home."""
+        expect(self.nav_home).to_be_visible()
+        self.nav_home.click()
+        expect(self.page).to_have_url(f"{self.BASE_URL}/home")
+
     def get_error_texts(self) -> list[str]:
         """Returns all currently visible error message strings on the page."""
         try:
