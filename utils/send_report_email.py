@@ -185,7 +185,8 @@ def send_email():
     msg.attach(MIMEText(EMAIL_BODY_HTML, "html"))
 
     # Attach report.html if available
-    report_path = os.path.join(os.path.dirname(__file__), "report.html")
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    report_path = os.path.join(project_root, "report.html")
     if os.path.exists(report_path):
         with open(report_path, "rb") as f:
             part = MIMEBase("application", "octet-stream")
@@ -212,7 +213,7 @@ def send_email():
         print("NOTE: SMTP credentials (SMTP_HOST, SMTP_USER, SMTP_PASS) not configured in environment.")
         print(f"Email content is prepared and saved to 'report_email_content.html' and 'test_report.md'.")
         # Save HTML email output so user can review or send anytime
-        with open("report_email_content.html", "w", encoding="utf-8") as f:
+        with open(os.path.join(project_root, "report_email_content.html"), "w", encoding="utf-8") as f:
             f.write(EMAIL_BODY_HTML)
         return False
 

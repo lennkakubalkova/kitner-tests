@@ -1,6 +1,7 @@
 import subprocess
 import time
 import sys
+import os
 
 TEST_LIST = [
     # Modul 0: Úvodní navigační rozcestník (Linktree) - US-01
@@ -53,6 +54,7 @@ TEST_LIST = [
 ]
 
 def main():
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     total_count = len(TEST_LIST)
     print("=" * 75, flush=True)
     print("SPUŠTĚNÍ VŠECH TESTŮ POSTUPNĚ PO JEDNOM", flush=True)
@@ -70,7 +72,8 @@ def main():
         res = subprocess.run(
             ["py", "-m", "pytest", test_node, "-q", "--tb=line"],
             capture_output=True,
-            text=True
+            text=True,
+            cwd=project_root
         )
         duration = time.time() - t0
         
