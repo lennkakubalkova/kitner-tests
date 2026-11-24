@@ -4,3 +4,8 @@ __pycache__/
 .pytest_cache/
 .env
 
+# Test reports & generated artifacts
+reports/
+*.html
+
+

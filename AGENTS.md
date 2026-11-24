@@ -33,8 +33,9 @@ Projekt je striktně rozdělen do 5 vrstev. Všechny nově vytvářené soubory 
 
 ### Pravidlo pro kořenový adresář:
 V kořenovém adresáři se smí nacházet **pouze globální konfigurační a projektové soubory**:
-* `pytest.ini`, `pyproject.toml`, `.gitignore`, `README.md`, `AGENTS.md`, `lokatory.md`.
-* **Žádné skripty, testy ani data se nesmí nacházet volně v kořeni projektu.**
+* `pytest.ini`, `pyproject.toml`, `.gitignore`, `README.md`, `AGENTS.md`, `lokatory.md`, `kontroly_asserty.md`.
+* **Žádné skripty, testy, data ani vygenerované reporty se nesmí nacházet volně v kořeni projektu.**
+* Vygenerované HTML reporty a artefakty testů se ukládají výhradně do složky `reports/` a jsou ignorovány v Gitu.
 
 ---
 
@@ -72,5 +73,5 @@ Projekt využívá Python 3.13, `pytest` a `playwright`.
   ```
 * **Generování HTML reportu:**
   ```bash
-  pytest --html=report.html --self-contained-html
+  pytest --html=reports/report.html --self-contained-html
   ```
