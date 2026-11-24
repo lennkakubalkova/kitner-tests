@@ -65,25 +65,11 @@ class TestForgotPassword:
         Akceptační kritérium US-05:
         'Po odeslání platné žádosti systém vygeneruje bezpečný, časově omezený resetovací odkaz
         a v rozhraní zobrazí potvrzení o odeslání požadavku.'
-        Kontroly (striktně v rozhraní aplikace bez podmíněného větvení):
+        Kontroly (reálné volání serveru bez simulace):
         1. Odeslání formuláře s platným e-mailem registrovaného uživatele.
         2. V rozhraní aplikace se zobrazí potvrzovací hláška 'We have emailed your password reset link!'.
         3. Potvrzovací hláška je viditelná v elementu div[data-test='status_div'].
         """
-        # Zajištění úspěšné odpovědi backendu (přemostění vyčerpané kvóty testovacího Mailtrap SMTP)
-        page.route(
-            "**/forgot-password",
-            lambda route: (
-                route.fulfill(
-                    status=200,
-                    content_type="application/json",
-                    body='{"status":"We have emailed your password reset link!"}'
-                )
-                if route.request.method == "POST"
-                else route.continue_()
-            )
-        )
-
         forgot_page = ForgotPasswordPage(page).open()
         forgot_page.request_password_reset(lector_credentials["email"])
 

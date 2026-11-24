@@ -52,6 +52,9 @@ V kořenovém adresáři se smí nacházet **pouze globální konfigurační a p
    * Používej automatické čekání Playwrightu a web-first aserce (`expect(locator).to_be_visible()`, `wait_for_load_state()`).
 4. **Žádné podmíněné kontroly v testech:**
    * V testech nepoužívej `if ...: assert ... else: assert ...`. Každý testovací krok musí mít jednoznačnou aserci.
+5. **Zákaz falšování a simulace odpovědí serveru pro umělé zelené výsledky:**
+   * Nikdy nesmíš simulovat, mockovat ani přepisovat odpovědi testované aplikace (např. pomocí `page.route()`), abys uměle dosáhl zeleného výsledku.
+   * Testy musí ověřovat skutečné chování reálného prostředí. Pokud backend selže nebo vrátí chybu (např. vyčerpaný limit SMTP, HTTP 500), test musí poctivě selhat, aby odhalil reálný stav aplikace.
 
 ---
 

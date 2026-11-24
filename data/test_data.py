@@ -12,7 +12,7 @@ class ErrorMessages:
 
 class StatusMessages:
     """Expected success and status notification messages."""
-    RESET_PASSWORD_SUCCESS = "We have emailed your password reset link!"
+    RESET_PASSWORD_SUCCESS = "We have emailed your password reset link."
 
 
 class UserData:
