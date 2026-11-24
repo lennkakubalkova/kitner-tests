@@ -46,7 +46,7 @@ class CoursesPage(BasePage):
     def open(self):
         """Navigate to the courses page."""
         self.page.goto(self.URL)
-        self.page.wait_for_load_state("networkidle")
+        self.course_cards.first.wait_for(state="visible", timeout=Config.DEFAULT_TIMEOUT)
         return self
 
     def has_lector_controls(self) -> bool:
@@ -84,9 +84,9 @@ class CoursesPage(BasePage):
             self.page.wait_for_load_state("networkidle")
 
     def get_all_course_names(self) -> list[str]:
-        """Returns all visible course names on the page."""
+        """Returns all visible course names on the page efficiently in one call."""
         self.course_names.first.wait_for(state="visible", timeout=Config.DEFAULT_TIMEOUT)
-        return [el.inner_text().strip() for el in self.course_names.all()]
+        return [name.strip() for name in self.course_names.all_inner_texts() if name.strip()]
 
     def search_courses(self, keyword: str) -> list[str]:
         """Filters/searches loaded courses matching the given keyword (US-11 / US03)."""
@@ -94,15 +94,29 @@ class CoursesPage(BasePage):
         return [name for name in names if keyword.lower() in name.lower()]
 
     def filter_courses_by_capacity(self, min_capacity: int) -> list[dict]:
-        """Filters courses having at least min_capacity (US-11 / US03)."""
+        """Filters courses having at least min_capacity (US-11 / US03).
+        Extracts cards and capacities in a single browser evaluation to avoid thousands of IPC round-trips.
+        """
         self.course_cards.first.wait_for(state="visible", timeout=Config.DEFAULT_TIMEOUT)
-        results = []
-        for card in self.course_cards.all():
-            cap_elem = card.locator('p[data-test="course_capacity"], p[data-testid="course_capacity"]').first
-            name_elem = card.locator('h2[data-test="course_name"], h2[data-testid="course_name"]').first
-            if cap_elem.is_visible() and name_elem.is_visible():
-                text = cap_elem.inner_text()
-                digits = [int(s) for s in text.split() if s.isdigit()]
-                if digits and digits[0] >= min_capacity:
-                    results.append({"name": name_elem.inner_text().strip(), "capacity": digits[0]})
-        return results
+        items = self.page.evaluate('''
+            () => {
+                const cards = document.querySelectorAll('div[data-test^="course_"], div[data-testid^="course_"]');
+                const list = [];
+                for (const card of cards) {
+                    const capEl = card.querySelector('p[data-test="course_capacity"], p[data-testid="course_capacity"]');
+                    const nameEl = card.querySelector('h2[data-test="course_name"], h2[data-testid="course_name"]');
+                    if (capEl && nameEl) {
+                        const text = capEl.innerText || "";
+                        const match = text.match(/\\d+/);
+                        if (match) {
+                            list.push({
+                                name: (nameEl.innerText || "").trim(),
+                                capacity: parseInt(match[0], 10)
+                            });
+                        }
+                    }
+                }
+                return list;
+            }
+        ''')
+        return [c for c in items if c["capacity"] >= min_capacity]
