@@ -66,7 +66,7 @@ class TestCourses:
 
     def test_lector_can_create_new_course(self, page, lector_credentials):
         """
-        CRS-04: Lektor úspěšně vytvoří nový kurz.
+        CRS-04 (US-14): Lektor úspěšně vytvoří nový kurz.
         Kontroly:
         1. Vyplnění a odeslání kurzu s unikátním názvem.
         2. Ověření, že nový kurz se objevil v přehledu kurzů na stránce.
