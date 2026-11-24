@@ -43,3 +43,10 @@ class LogoutData:
     EXPECTED_LOGIN_BUTTON_TEXT = "Přihlásit se"
 
 
+class MyCoursesData:
+    """Test data and expectations for US-13 My Courses module."""
+    EXPECTED_TITLE = "Mé zapsané kurzy"
+    URL_PATH = "/my-courses"
+
+
+
