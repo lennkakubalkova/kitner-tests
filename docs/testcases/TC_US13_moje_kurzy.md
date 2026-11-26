@@ -66,4 +66,4 @@
   4. Po potvrzení registrace přejdi v menu do sekce „Moje kurzy“.
 * **Očekávaný výsledek (Expected Result):**
   1. Stránka `/my-courses` zobrazuje kontejner se zapsaným kurzem.
-  2. V přehledu je viditelný odpovídající zapsaný kurz.
+  2. V přehledu je viditelný konkrétní zapsaný kurz s odpovídajícím názvem kurzu.

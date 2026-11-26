@@ -175,17 +175,31 @@ def scan_manual_test_cases(docs_dir: str) -> dict:
                 tc_items = re.findall(r"(?m)^#{2,4}\s+TC[-_]?\d+", content)
                 count = len(tc_items)
                 
-                # Zjištění správné příslušnosti k User Story
+                # Zjištění správné příslušnosti k User Story (US-01 až US-19)
                 assigned_us = None
-                if "zapis" in f.lower() or "zápis" in content.lower():
-                    # US04 ze starého číslování je US-12 (Zápis studenta na termín kurzu)
+                fname = f.lower()
+                c_lower = content.lower()
+                
+                if "registrace" in fname or "registrace zákaznického" in c_lower:
+                    assigned_us = "US-02"
+                elif "prihlaseni" in fname or "přihlašování" in c_lower:
+                    assigned_us = "US-03"
+                elif "filtrovani" in fname or "filtrování" in c_lower:
+                    assigned_us = "US-11"
+                elif "zapis" in fname or "zápis" in c_lower:
                     assigned_us = "US-12"
-                elif "moje_kurzy" in f.lower() or "moje kurzy" in content.lower():
+                elif "moje_kurzy" in fname or "moje kurzy" in c_lower:
                     assigned_us = "US-13"
+                elif "termin" in fname or "tvorba termínu" in c_lower or "vypsání termínu" in c_lower:
+                    assigned_us = "US-15"
                 else:
-                    us_match = re.search(r"\bUS[-_]?(\d+)\b", f + " " + content, re.IGNORECASE)
-                    if us_match:
-                        assigned_us = f"US-{int(us_match.group(1)):02d}"
+                    canonical_us = re.search(r"\bUS-(\d{2})\b", content, re.IGNORECASE)
+                    if canonical_us:
+                        assigned_us = f"US-{int(canonical_us.group(1)):02d}"
+                    else:
+                        us_match = re.search(r"\bUS[-_]?(\d+)\b", f + " " + content, re.IGNORECASE)
+                        if us_match:
+                            assigned_us = f"US-{int(us_match.group(1)):02d}"
 
                 if assigned_us:
                     tc_counts[assigned_us] = tc_counts.get(assigned_us, 0) + count
@@ -225,34 +239,43 @@ def scan_automated_tests(tests_dir: str) -> dict:
                             assigned_us.add("US-14")
                         else:
                             assigned_us.add("US-09")
+                elif f == "test_course_filter.py":
+                    assigned_us.add("US-11")
+                elif f == "test_course_enrollment.py":
+                    assigned_us.add("US-12")
+                elif f == "test_course_iteration.py":
+                    assigned_us.add("US-15")
+                elif f == "test_registration.py":
+                    assigned_us.add("US-02")
+                elif f == "test_login.py":
+                    assigned_us.add("US-03")
+                elif f == "test_logout.py":
+                    assigned_us.add("US-04")
+                elif f == "test_forgot_password.py":
+                    assigned_us.add("US-05")
+                elif f == "test_portal.py":
+                    assigned_us.add("US-01")
+                elif f == "test_profile.py":
+                    assigned_us.add("US-18")
+                elif f == "test_my_courses.py":
+                    assigned_us.add("US-13")
+                elif f == "test_navigation.py":
+                    assigned_us.add("US-19")
                 else:
-                    us_in_test = re.findall(r"\bUS[-_]?(\d+)\b", docstring, re.IGNORECASE)
-                    if us_in_test:
-                        for num in us_in_test:
+                    canonical_us = re.findall(r"\bUS-(\d{2})\b", docstring, re.IGNORECASE)
+                    if canonical_us:
+                        for num in canonical_us:
                             assigned_us.add(f"US-{int(num):02d}")
                     else:
-                        header_us = re.findall(r"\bUS[-_]?(\d+)\b", file_header, re.IGNORECASE)
-                        if header_us:
-                            for num in header_us:
+                        us_in_test = re.findall(r"\bUS[-_]?(\d+)\b", docstring, re.IGNORECASE)
+                        if us_in_test:
+                            for num in us_in_test:
                                 assigned_us.add(f"US-{int(num):02d}")
                         else:
-                            # Heuristické mapování podle názvu souboru
-                            if "registration" in f:
-                                assigned_us.add("US-02")
-                            elif "login" in f:
-                                assigned_us.add("US-03")
-                            elif "logout" in f:
-                                assigned_us.add("US-04")
-                            elif "forgot_password" in f:
-                                assigned_us.add("US-05")
-                            elif "portal" in f:
-                                assigned_us.add("US-01")
-                            elif "profile" in f:
-                                assigned_us.add("US-18")
-                            elif "my_courses" in f:
-                                assigned_us.add("US-13")
-                            elif "navigation" in f:
-                                assigned_us.add("US-19")
+                            header_us = re.findall(r"\bUS[-_]?(\d+)\b", file_header, re.IGNORECASE)
+                            if header_us:
+                                for num in header_us:
+                                    assigned_us.add(f"US-{int(num):02d}")
 
                 for u_id in assigned_us:
                     if u_id not in at_mapping:

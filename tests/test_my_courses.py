@@ -57,6 +57,7 @@ class TestMyCourses:
 
         # Přihlášení na termín
         detail_page = CourseDetailPage(page, course_id=1).open()
+        course_name = detail_page.course_name.inner_text()
         detail_page.open_enrollment_for_available_term()
         detail_page.submit_enrollment(phone=ProfileData.VALID_PHONE, ico=ProfileData.VALID_ICO)
 
@@ -68,3 +69,7 @@ class TestMyCourses:
         expect(my_courses_page.page_container).to_be_visible()
         expect(my_courses_page.courses_section).to_be_visible()
         expect(my_courses_page.courses_title).to_have_text(MyCoursesData.EXPECTED_TITLE)
+
+        # Zpřísněná kontrola konkrétního zapsaného kurzu
+        expect(my_courses_page.get_course_card(1)).to_be_visible()
+        expect(my_courses_page.get_course_name_by_id(1)).to_have_text(course_name)

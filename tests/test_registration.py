@@ -8,7 +8,7 @@ class TestRegistration:
 
     def test_registration_success_verifies_login_state_and_welcome(self, page):
         """
-        REG-01 (US-02, US-17): Positive registration of a new user.
+        TC-01 / REG-01 (US-02, US-17): Positive registration of a new user.
         Checks:
         1. Redirection to /home.
         2. Welcome banner displays user's name ('Vítej uživateli <name>!').
@@ -45,7 +45,7 @@ class TestRegistration:
 
     def test_registration_empty_form_validation(self, page):
         """
-        REG-02 (US-02): Submitting empty registration form.
+        TC-02 / REG-02 (US-02): Submitting empty registration form.
         Checks:
         1. User stays on /register.
         2. Required field errors for name, email, and password appear.
@@ -63,7 +63,7 @@ class TestRegistration:
 
     def test_registration_password_mismatch(self, page):
         """
-        REG-03 (US-02): Password confirmation does not match password.
+        TC-03 / REG-03 (US-02): Password confirmation does not match password.
         Checks:
         1. Form is rejected, URL remains /register.
         2. Confirmation mismatch error appears.
@@ -87,7 +87,7 @@ class TestRegistration:
 
     def test_registration_duplicate_email(self, page, lector_credentials):
         """
-        REG-04 (US-02): Attempting to register with an already existing email.
+        TC-04 / REG-04 (US-02): Attempting to register with an already existing email.
         Checks:
         1. Application rejects duplicate registration.
         2. Error message 'The email has already been taken.' appears.

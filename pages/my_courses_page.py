@@ -25,4 +25,12 @@ class MyCoursesPage(BasePage):
         expect(self.page).to_have_url(self.URL)
         expect(self.courses_title).to_be_visible()
 
+    def get_course_card(self, course_id: int):
+        """Returns locator for a specific course container by ID."""
+        return self.page.locator(f'[data-test="course_{course_id}"]')
+
+    def get_course_name_by_id(self, course_id: int):
+        """Returns locator for course title within a specific course container."""
+        return self.page.locator(f'[data-test="course_{course_id}"] [data-test="course_name"]')
+
 

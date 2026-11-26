@@ -19,7 +19,10 @@ class CourseDetailPage(BasePage):
         # Enrollment registration form elements (/courses/{id}/register - US-12 / US04)
         self.phone_input = page.locator('input[data-test="phone_input"]')
         self.ico_input = page.locator('input[data-test="ico_input"]')
-        self.submit_enrollment_button = page.locator('button[data-test="registration_link"]:has-text("Nezávazná registrace")')
+        self.phone_error = page.locator('[data-test="phone_error"]')
+        self.ico_error = page.locator('[data-test="ico_error"]')
+        self.registration_form = page.locator('form[data-test="registration_form"]')
+        self.submit_enrollment_button = page.locator('form[data-test="registration_form"] button[data-test="registration_link"]')
 
     def open_enrollment_for_available_term(self):
         """Clicks on the first available iteration's 'Nezávazná registrace' button and waits for registration page."""

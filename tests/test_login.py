@@ -32,7 +32,7 @@ class TestLogin:
 
     def test_login_registered_user_success(self, page, registered_user):
         """
-        LOG-02 (US-03): Successful login with newly registered real user.
+        TC-01 / LOG-02 (US-03): Successful login with newly registered real user.
         Checks:
         1. User successfully logs in with real registered credentials.
         2. Redirection and menu state shows user is authenticated.
@@ -70,7 +70,7 @@ class TestLogin:
 
     def test_login_invalid_password(self, page, lector_credentials):
         """
-        LOG-04 (US-03): Existing user with incorrect password.
+        TC-02 / LOG-04 (US-03): Existing user with incorrect password.
         Checks:
         1. URL remains on /login.
         2. Exact authentication error message 'These credentials do not match our records.' appears.
@@ -107,7 +107,7 @@ class TestLogin:
 
     def test_logout_flow_and_session_cleared(self, page, lector_credentials):
         """
-        LOG-06 (US-04): Complete logout flow.
+        TC-03 / LOG-06 (US-04): Complete logout flow.
         Checks:
         1. Lector logs in -> verifies logged in state and presence of privileged buttons.
         2. Lector clicks 'Odhlásit se'.
