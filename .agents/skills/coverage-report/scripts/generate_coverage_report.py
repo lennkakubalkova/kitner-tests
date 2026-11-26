@@ -13,53 +13,75 @@ import json
 import argparse
 from datetime import datetime
 
-# Definice oficiálních User Stories projektu Kitner
+# Definice všech 19 oficiálních User Stories projektu Kitner
+# odpovídající 19 požadavkům specifikace / funkční analýzy (F01–F19)
 PROJECT_USER_STORIES = [
     {
         "id": "US-01",
-        "alias": ["US01"],
+        "alias": ["US01", "F16"],
         "title": "Úvodní navigační rozcestník portálu",
         "module": "Modul 0: Portál a rozcestník",
         "description": "Jako návštěvník chci přehledný rozcestník s odkazy na jednotlivé demo aplikace, abych se mohl snadno zorientovat a přejít k testování."
     },
     {
         "id": "US-02",
-        "alias": ["US01-REG", "US01_REG"],
+        "alias": ["US01-REG", "US01_REG", "F08"],
         "title": "Registrace zákaznického účtu a validace",
         "module": "Modul 1: Autentizace",
         "description": "Jako nový uživatel se chci zaregistrovat pomocí jména, emailu a hesla, aby mi systém vytvořil bezpečný profil a ověřil unikátnost emailu."
     },
     {
         "id": "US-03",
-        "alias": ["US02-LOG"],
+        "alias": ["US02-LOG", "F09"],
         "title": "Přihlašování uživatelů a autorizace rolí",
         "module": "Modul 1: Autentizace",
         "description": "Jako registrovaný uživatel nebo lektor se chci přihlásit do aplikace, abych získal přístup k funkcím podle své role."
     },
     {
         "id": "US-04",
-        "alias": ["US02-LGT"],
+        "alias": ["US02-LGT", "F14"],
         "title": "Odhlášení ze systému a ukončení sezení",
         "module": "Modul 1: Autentizace",
         "description": "Jako přihlášený uživatel se chci kdykoliv bezpečně odhlásit, aby bylo mé sezení ukončeno a privátní ovládací prvky skryty."
     },
     {
         "id": "US-05",
-        "alias": [],
+        "alias": ["F10"],
         "title": "Obnova zapomenutého hesla",
         "module": "Modul 1: Autentizace",
         "description": "Jako uživatel chci požádat o resetovací odkaz na email v případě zapomenutého hesla, abych mohl obnovit přístup k účtu."
     },
     {
+        "id": "US-06",
+        "alias": ["F11"],
+        "title": "Nastavení nového hesla pomocí tokenu (Reset hesla)",
+        "module": "Modul 1: Autentizace",
+        "description": "Jako uživatel s platným resetovacím tokenem chci nastavit nové heslo na stránce /password-reset/:token, abych mohl obnovit přístup k účtu."
+    },
+    {
+        "id": "US-07",
+        "alias": ["F12"],
+        "title": "Ověření e-mailu odkazem (Aktivace účtu)",
+        "module": "Modul 1: Autentizace",
+        "description": "Jako registrovaný uživatel chci ověřit svou e-mailovou adresu kliknutím na odkaz /verify-email/{id}/{hash}, abych plně aktivoval svůj účet."
+    },
+    {
+        "id": "US-08",
+        "alias": ["F13"],
+        "title": "Znovuzaslání verifikačního e-mailu",
+        "module": "Modul 1: Autentizace",
+        "description": "Jako přihlášený uživatel s neověřeným účtem chci mít možnost nechat si znovu zaslat ověřovací odkaz, pokud předchozí nedorazil."
+    },
+    {
         "id": "US-09",
-        "alias": [],
+        "alias": ["F01"],
         "title": "Veřejný přehled a katalog kurzů",
         "module": "Modul 2: Katalog kurzů",
         "description": "Jako anonymní návštěvník chci vidět seznam všech nabízených kurzů včetně cen a kapacit bez nutnosti přihlášení."
     },
     {
         "id": "US-10",
-        "alias": [],
+        "alias": ["F02"],
         "title": "Zobrazení detailu kurzu a termínů",
         "module": "Modul 2: Katalog kurzů",
         "description": "Jako zájemce o kurz chci zobrazit podrobné informace o osnově a vypsaných termínech, abych si mohl vybrat termín konání."
@@ -73,49 +95,49 @@ PROJECT_USER_STORIES = [
     },
     {
         "id": "US-12",
-        "alias": ["US04"],
+        "alias": ["US04", "F03"],
         "title": "Zápis studenta na vypsaný termín kurzu",
         "module": "Modul 4: Zápis na kurzy",
         "description": "Jako student se chci přihlásit na volný termín kurzu vyplněním telefonu a IČO, abych si zajistil místo na školení."
     },
     {
         "id": "US-13",
-        "alias": [],
+        "alias": ["F04"],
         "title": "Přehled zapsaných kurzů (Moje kurzy)",
         "module": "Modul 3: Zákaznická zóna",
         "description": "Jako přihlášený student chci mít přehled svých zapsaných kurzů na stránce Moje kurzy, abych viděl termíny svých akcí."
     },
     {
         "id": "US-14",
-        "alias": [],
+        "alias": ["F05"],
         "title": "Vytvoření nového kurzu lektorem",
         "module": "Modul 2: Správa kurzů",
         "description": "Jako lektor chci zakládat nové vzdělávací kurzy s názvem, popisem, kapacitou a cenou, abych rozšířil nabídku školení."
     },
     {
         "id": "US-15",
-        "alias": ["US05"],
+        "alias": ["US05", "F06"],
         "title": "Vypsání termínu (iterace) kurzu lektorem",
         "module": "Modul 2: Správa kurzů",
         "description": "Jako lektor chci k existujícímu kurzu vypsat nový termín (datum, den, čas, místo), aby se na něj mohli studenti registrovat."
     },
     {
         "id": "US-16",
-        "alias": [],
+        "alias": ["F07"],
         "title": "Zobrazení přihlášených účastníků pro lektora",
         "module": "Modul 2: Správa kurzů",
         "description": "Jako lektor chci vidět seznam přihlášených studentů na mých kurzech, abych měl přehled o obsazenosti a účastnících."
     },
     {
         "id": "US-17",
-        "alias": [],
+        "alias": ["F17"],
         "title": "Personalizované uvítání nového uživatele",
         "module": "Modul 5: Uživatelská zóna",
         "description": "Jako nově registrovaný uživatel chci po prvním přihlášení vidět uvítací hlášku se svým jménem pro potvrzení identity."
     },
     {
         "id": "US-18",
-        "alias": [],
+        "alias": ["F15"],
         "title": "Uživatelský profil a správa údajů",
         "module": "Modul 5: Uživatelská zóna",
         "description": "Jako přihlášený uživatel chci v sekci Můj Profil vidět své údaje a mít možnost aktualizovat telefon a IČO."
@@ -150,14 +172,23 @@ def scan_manual_test_cases(docs_dir: str) -> dict:
                 fpath = os.path.join(root, f)
                 content = read_file_safe(fpath)
                 
-                # Hledáme US v názvu souboru nebo obsahu
-                us_in_file = re.findall(r"\bUS[-_]?(\d+)\b", f + " " + content, re.IGNORECASE)
                 tc_items = re.findall(r"(?m)^#{2,4}\s+TC[-_]?\d+", content)
                 count = len(tc_items)
                 
-                for us_num in set(us_in_file):
-                    us_id = f"US-{int(us_num):02d}"
-                    tc_counts[us_id] = tc_counts.get(us_id, 0) + count
+                # Zjištění správné příslušnosti k User Story
+                assigned_us = None
+                if "zapis" in f.lower() or "zápis" in content.lower():
+                    # US04 ze starého číslování je US-12 (Zápis studenta na termín kurzu)
+                    assigned_us = "US-12"
+                elif "moje_kurzy" in f.lower() or "moje kurzy" in content.lower():
+                    assigned_us = "US-13"
+                else:
+                    us_match = re.search(r"\bUS[-_]?(\d+)\b", f + " " + content, re.IGNORECASE)
+                    if us_match:
+                        assigned_us = f"US-{int(us_match.group(1)):02d}"
+
+                if assigned_us:
+                    tc_counts[assigned_us] = tc_counts.get(assigned_us, 0) + count
 
     return tc_counts
 
@@ -173,48 +204,55 @@ def scan_automated_tests(tests_dir: str) -> dict:
             fpath = os.path.join(tests_dir, f)
             content = read_file_safe(fpath)
 
-            # Rozdělení na jednotlivé testovací funkce
-            # Hledáme def test_...(self, ...) nebo def test_...(...)
             test_funcs = re.split(r"(?m)^(?:\s{4}|\s{0})def\s+(test_\w+)\s*\(", content)
-            
-            # První část je hlavička souboru
             file_header = test_funcs[0]
-            header_us = re.findall(r"\bUS[-_]?(\d+)\b", file_header, re.IGNORECASE)
 
             for i in range(1, len(test_funcs), 2):
                 func_name = test_funcs[i]
                 func_body = test_funcs[i+1] if i+1 < len(test_funcs) else ""
-                
-                # Hledáme US zmínky v těle/docstringu testu
-                us_in_test = re.findall(r"\bUS[-_]?(\d+)\b", func_body[:800], re.IGNORECASE)
+                docstring = func_body[:800]
                 
                 assigned_us = set()
-                if us_in_test:
-                    for num in us_in_test:
-                        assigned_us.add(f"US-{int(num):02d}")
-                elif header_us:
-                    for num in header_us:
-                        assigned_us.add(f"US-{int(num):02d}")
+                
+                if f == "test_courses.py":
+                    # V test_courses.py mapujeme na odpovídající User Stories kurzů (US-09 až US-16)
+                    course_us = re.findall(r"\bUS-(09|10|11|12|14|15|16)\b", docstring, re.IGNORECASE)
+                    if course_us:
+                        for num in course_us:
+                            assigned_us.add(f"US-{int(num):02d}")
+                    else:
+                        if "create_course" in func_name:
+                            assigned_us.add("US-14")
+                        else:
+                            assigned_us.add("US-09")
                 else:
-                    # Heuristické mapování podle názvu souboru
-                    if "registration" in f:
-                        assigned_us.add("US-02")
-                    elif "login" in f:
-                        assigned_us.add("US-03")
-                    elif "logout" in f:
-                        assigned_us.add("US-04")
-                    elif "forgot_password" in f:
-                        assigned_us.add("US-05")
-                    elif "portal" in f:
-                        assigned_us.add("US-01")
-                    elif "profile" in f:
-                        assigned_us.add("US-18")
-                    elif "my_courses" in f:
-                        assigned_us.add("US-13")
-                    elif "navigation" in f:
-                        assigned_us.add("US-19")
-                    elif "courses" in f:
-                        assigned_us.add("US-09")
+                    us_in_test = re.findall(r"\bUS[-_]?(\d+)\b", docstring, re.IGNORECASE)
+                    if us_in_test:
+                        for num in us_in_test:
+                            assigned_us.add(f"US-{int(num):02d}")
+                    else:
+                        header_us = re.findall(r"\bUS[-_]?(\d+)\b", file_header, re.IGNORECASE)
+                        if header_us:
+                            for num in header_us:
+                                assigned_us.add(f"US-{int(num):02d}")
+                        else:
+                            # Heuristické mapování podle názvu souboru
+                            if "registration" in f:
+                                assigned_us.add("US-02")
+                            elif "login" in f:
+                                assigned_us.add("US-03")
+                            elif "logout" in f:
+                                assigned_us.add("US-04")
+                            elif "forgot_password" in f:
+                                assigned_us.add("US-05")
+                            elif "portal" in f:
+                                assigned_us.add("US-01")
+                            elif "profile" in f:
+                                assigned_us.add("US-18")
+                            elif "my_courses" in f:
+                                assigned_us.add("US-13")
+                            elif "navigation" in f:
+                                assigned_us.add("US-19")
 
                 for u_id in assigned_us:
                     if u_id not in at_mapping:
@@ -228,11 +266,10 @@ def scan_automated_tests(tests_dir: str) -> dict:
 
 def generate_html_report(us_data: list, summary: dict, output_path: str):
     """Generates a modern, clean HTML coverage report."""
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
     
     rows_html = []
     for item in us_data:
-        status_badge = ""
         if item["status"] == "POKRYTO":
             status_badge = '<span class="badge badge-success">🟢 POKRYTO</span>'
         elif item["status"] == "POUZE MANUÁLNÍ":
@@ -240,7 +277,6 @@ def generate_html_report(us_data: list, summary: dict, output_path: str):
         else:
             status_badge = '<span class="badge badge-danger">🔴 NEPOKRYTO</span>'
 
-        test_list_html = ""
         if item["automated_tests"]:
             test_items = "".join([f'<li><code>{t["file"]}::{t["function"]}</code></li>' for t in item["automated_tests"]])
             test_list_html = f'<details><summary>Zobrazit testy ({len(item["automated_tests"])})</summary><ul class="test-list">{test_items}</ul></details>'
@@ -463,9 +499,38 @@ def generate_html_report(us_data: list, summary: dict, output_path: str):
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
 
+def generate_markdown_report(us_data: list, summary: dict, output_path: str):
+    """Generates a markdown summary coverage report."""
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+    lines = [
+        "# Matice pokrytí User Stories automatizovanými testy",
+        f"\n**Celkové pokrytí US:** {summary['coverage_percent']:.1f} % ({summary['covered_us_count']} / {summary['total_us_count']})",
+        f"**Celkem automatizovaných testů:** {summary['total_at_count']} | **Zpracované manuální TC:** {summary['total_manual_tc_count']}\n",
+        "| ID | Název User Story | Modul | Manuální TC | Automat. testy | Stav pokrytí |",
+        "| :--- | :--- | :--- | :---: | :---: | :--- |"
+    ]
+    for item in us_data:
+        status_icon = "🟢 POKRYTO" if item["status"] == "POKRYTO" else "🟡 POUZE TC" if item["status"] == "POUZE MANUÁLNÍ" else "🔴 NEPOKRYTO"
+        lines.append(f"| **{item['id']}** | {item['title']} | {item['module']} | {item['manual_tc_count']} | {item['at_count']} | {status_icon} |")
+    
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+
+def generate_json_report(us_data: list, summary: dict, output_path: str):
+    """Generates a structured JSON coverage report."""
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+    data = {
+        "summary": summary,
+        "user_stories": us_data,
+        "generated_at": datetime.now().isoformat()
+    }
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
 def main():
     parser = argparse.ArgumentParser(description="Generátor přehledu pokrytí User Stories automatizovanými testy.")
-    parser.add_argument("--output", default="reports/coverage_report.html", help="Cesta k výstupnímu HTML souboru")
+    parser.add_argument("--output", default="docs/coverage_report.html", help="Cesta k výstupnímu souboru (výchozí: docs/coverage_report.html)")
+    parser.add_argument("--format", choices=["html", "json", "markdown"], default="html", help="Formát výstupu: html, json nebo markdown (výchozí: html)")
     args = parser.parse_args()
 
     project_root = os.getcwd()
@@ -541,10 +606,16 @@ def main():
     print(f"POČET AUTOMATIZOVANÝCH TESTŮ: {total_at_count} | MANUÁLNÍCH TC: {total_manual_tc}")
     print("=" * 80)
 
-    # 4. Uložení HTML reportu
+    # 4. Uložení reportu podle zvoleného formátu
     output_abs = os.path.abspath(args.output)
-    generate_html_report(table_data, summary, output_abs)
-    print(f"\n✅ HTML report byl úspěšně vygenerován do: {output_abs}")
+    if args.format == "json":
+        generate_json_report(table_data, summary, output_abs)
+    elif args.format == "markdown":
+        generate_markdown_report(table_data, summary, output_abs)
+    else:
+        generate_html_report(table_data, summary, output_abs)
+
+    print(f"\n✅ Report ({args.format.upper()}) byl úspěšně vygenerován do: {output_abs}")
 
 if __name__ == "__main__":
     main()

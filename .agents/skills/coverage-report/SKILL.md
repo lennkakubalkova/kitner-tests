@@ -1,6 +1,6 @@
 ---
 name: coverage-report
-description: Použij vždy, když uživatel chce zobrazit nebo vygenerovat přehled pokrytí User Stories testy, zjistit stav automatizace projektu nebo vygenerovat HTML report matice sledovatelnosti (Traceability Matrix).
+description: Použij vždy, když uživatel chce zobrazit přehled pokrytí, nebo když agent autonomně vyhodnocuje stav pokrytí User Stories, ověřuje míru automatizace projektu, identifikuje nepokryté požadavky nebo aktualizuje report matice sledovatelnosti (Traceability Matrix) po úpravách testů.
 ---
 
 # Generování přehledu pokrytí User Stories automatizovanými testy
@@ -20,7 +20,7 @@ Tento skill slouží k opakovatelnému mapování a vyhodnocování pokrytí vš
    * Počet automatizovaných testů připadajících na jednotlivé User Stories.
    * Identifikace nepokrytých nebo částečně pokrytých požadavků.
 3. **Výstupy:**
-   * **Interaktivní HTML report:** ukládá se do `reports/coverage_report.html` (respektuje pravidlo čistého kořene v `AGENTS.md`).
+   * **Interaktivní HTML report:** ukládá se do verzované složky `docs/coverage_report.html` (respektuje pravidlo čistého kořene v `AGENTS.md`).
    * **Konzolový souhrn:** přehledná tabulka v terminálu.
 
 ---
@@ -34,8 +34,8 @@ python .agents/skills/coverage-report/scripts/generate_coverage_report.py
 ```
 
 Volitelné parametry:
-* `--output <cesta>`: Změna výstupního souboru (výchozí: `reports/coverage_report.html`).
-* `--format [html|json|markdown]`: Formát výstupu.
+* `--output <cesta>`: Změna výstupního souboru (výchozí: `docs/coverage_report.html`).
+* `--format [html|json|markdown]`: Formát výstupu (výchozí: `html`).
 
 ---
 

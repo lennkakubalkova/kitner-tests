@@ -1,6 +1,6 @@
 ---
 name: ust-to-tc
-description: Použij vždy, když uživatel zadá User Story, požadavek nebo zadání a chce z něj vytvořit manuální test casy, provést analýzu akceptačních kritérií nebo navrhnout testovací scénáře.
+description: Použij vždy, když uživatel zadá User Story, požadavek nebo zadání, nebo když agent při práci s User Stories autonomně analyzuje akceptační kritéria, navrhuje manuální test casy či doplňuje chybějící testovací scénáře pro nepokryté požadavky.
 ---
 
 # Pracovní postup: Převod User Story na manuální Test Casy (UST -> TC)

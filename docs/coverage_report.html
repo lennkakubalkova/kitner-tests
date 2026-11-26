@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Přehled pokrytí User Stories automatizovanými testy</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 24px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 28px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 { margin: 0 0 8px 0; font-size: 26px; }
+        .header p { margin: 0; opacity: 0.9; font-size: 14px; }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+        .kpi-label { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; }
+        .kpi-value { font-size: 28px; font-weight: 700; color: #0f172a; }
+        .progress-bar-container {
+            background: #e2e8f0;
+            border-radius: 9999px;
+            height: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #f59e0b;
+            width: 84.21052631578947%;
+            transition: width 0.3s ease;
+        }
+        .table-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f1f5f9;
+            padding: 14px 16px;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: top;
+        }
+        tr:hover { background-color: #f8fafc; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .text-sm { font-size: 12px; }
+        .text-muted { color: #64748b; }
+        .text-center { text-align: center; }
+        .text-primary { color: #2563eb; }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-success { background-color: #dcfce7; color: #15803d; }
+        .badge-warning { background-color: #fef3c7; color: #b45309; }
+        .badge-danger { background-color: #fee2e2; color: #b91c1c; }
+        .module-tag {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        details summary {
+            cursor: pointer;
+            color: #2563eb;
+            font-weight: 600;
+            outline: none;
+        }
+        .test-list {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+            font-size: 12px;
+            color: #334155;
+        }
+        .test-list li { margin-bottom: 4px; }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 11px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Matice pokrytí User Stories automatizovanými testy</h1>
+            <p>Projekt: <strong>Kitner Testování (Demo Login)</strong> | Vygenerováno: <strong>26.11.2026 v 23:23:07</strong></p>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Celkové pokrytí US</div>
+                <div class="kpi-value">84.2 %</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Pokryté User Stories</div>
+                <div class="kpi-value">16 / 19</div>
+                <div class="text-sm text-muted" style="margin-top: 6px;">3 zbývá pokrýt</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Celkem automatizovaných testů</div>
+                <div class="kpi-value text-primary">46</div>
+                <div class="text-sm text-muted" style="margin-top: 6px;">Spouštěno přes pytest</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Zpracované manuální TC</div>
+                <div class="kpi-value">7</div>
+                <div class="text-sm text-muted" style="margin-top: 6px;">V adresáři docs/testcases/</div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Název a popis User Story</th>
+                        <th>Modul</th>
+                        <th style="width: 100px; text-align: center;">Manuální TC</th>
+                        <th style="width: 100px; text-align: center;">Automat. testy</th>
+                        <th style="width: 150px;">Stav pokrytí</th>
+                        <th>Seznam přiřazených testů</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td class="font-bold">US-01</td>
+            <td>
+                <div class="font-semibold">Úvodní navigační rozcestník portálu</div>
+                <div class="text-sm text-muted">Jako návštěvník chci přehledný rozcestník s odkazy na jednotlivé demo aplikace, abych se mohl snadno zorientovat a přejít k testování.</div>
+            </td>
+            <td><span class="module-tag">Modul 0: Portál a rozcestník</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">4</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (4)</summary><ul class="test-list"><li><code>test_portal.py::test_portal_navigation_links_present_and_valid</code></li><li><code>test_portal.py::test_portal_demo_login_link_navigates_to_courses</code></li><li><code>test_registration.py::test_registration_invalid_email_format</code></li><li><code>test_registration.py::test_registration_empty_password_confirmation</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-02</td>
+            <td>
+                <div class="font-semibold">Registrace zákaznického účtu a validace</div>
+                <div class="text-sm text-muted">Jako nový uživatel se chci zaregistrovat pomocí jména, emailu a hesla, aby mi systém vytvořil bezpečný profil a ověřil unikátnost emailu.</div>
+            </td>
+            <td><span class="module-tag">Modul 1: Autentizace</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">10</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (10)</summary><ul class="test-list"><li><code>test_registration.py::test_registration_success_verifies_login_state_and_welcome</code></li><li><code>test_registration.py::test_registration_empty_form_validation</code></li><li><code>test_registration.py::test_registration_password_mismatch</code></li><li><code>test_registration.py::test_registration_duplicate_email</code></li><li><code>test_registration.py::test_registration_missing_name_only</code></li><li><code>test_registration.py::test_registration_missing_password_only</code></li><li><code>test_registration.py::test_registration_link_navigates_to_login</code></li><li><code>test_registration.py::test_registration_duplicate_email_case_insensitive</code></li><li><code>test_registration.py::test_registration_invalid_email_format</code></li><li><code>test_registration.py::test_registration_empty_password_confirmation</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-03</td>
+            <td>
+                <div class="font-semibold">Přihlašování uživatelů a autorizace rolí</div>
+                <div class="text-sm text-muted">Jako registrovaný uživatel nebo lektor se chci přihlásit do aplikace, abych získal přístup k funkcím podle své role.</div>
+            </td>
+            <td><span class="module-tag">Modul 1: Autentizace</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">7</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (7)</summary><ul class="test-list"><li><code>test_login.py::test_login_lector_success_and_privileges</code></li><li><code>test_login.py::test_login_registered_user_success</code></li><li><code>test_login.py::test_login_empty_fields_validation</code></li><li><code>test_login.py::test_login_invalid_password</code></li><li><code>test_login.py::test_login_nonexistent_user</code></li><li><code>test_login.py::test_login_navigation_to_register</code></li><li><code>test_login.py::test_login_case_insensitive_and_trimmed_email</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-04</td>
+            <td>
+                <div class="font-semibold">Odhlášení ze systému a ukončení sezení</div>
+                <div class="text-sm text-muted">Jako přihlášený uživatel se chci kdykoliv bezpečně odhlásit, aby bylo mé sezení ukončeno a privátní ovládací prvky skryty.</div>
+            </td>
+            <td><span class="module-tag">Modul 1: Autentizace</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">2</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (2)</summary><ul class="test-list"><li><code>test_login.py::test_logout_flow_and_session_cleared</code></li><li><code>test_logout.py::test_user_logout_success</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-05</td>
+            <td>
+                <div class="font-semibold">Obnova zapomenutého hesla</div>
+                <div class="text-sm text-muted">Jako uživatel chci požádat o resetovací odkaz na email v případě zapomenutého hesla, abych mohl obnovit přístup k účtu.</div>
+            </td>
+            <td><span class="module-tag">Modul 1: Autentizace</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">4</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (4)</summary><ul class="test-list"><li><code>test_forgot_password.py::test_navigation_from_login_to_forgot_password</code></li><li><code>test_forgot_password.py::test_forgot_password_empty_email_validation</code></li><li><code>test_forgot_password.py::test_forgot_password_nonexistent_email_validation</code></li><li><code>test_forgot_password.py::test_forgot_password_registered_user_submission</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-06</td>
+            <td>
+                <div class="font-semibold">Nastavení nového hesla pomocí tokenu (Reset hesla)</div>
+                <div class="text-sm text-muted">Jako uživatel s platným resetovacím tokenem chci nastavit nové heslo na stránce /password-reset/:token, abych mohl obnovit přístup k účtu.</div>
+            </td>
+            <td><span class="module-tag">Modul 1: Autentizace</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">0</td>
+            <td><span class="badge badge-danger">🔴 NEPOKRYTO</span></td>
+            <td><span class="text-muted">Žádný automatizovaný test</span></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-07</td>
+            <td>
+                <div class="font-semibold">Ověření e-mailu odkazem (Aktivace účtu)</div>
+                <div class="text-sm text-muted">Jako registrovaný uživatel chci ověřit svou e-mailovou adresu kliknutím na odkaz /verify-email/{id}/{hash}, abych plně aktivoval svůj účet.</div>
+            </td>
+            <td><span class="module-tag">Modul 1: Autentizace</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">0</td>
+            <td><span class="badge badge-danger">🔴 NEPOKRYTO</span></td>
+            <td><span class="text-muted">Žádný automatizovaný test</span></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-08</td>
+            <td>
+                <div class="font-semibold">Znovuzaslání verifikačního e-mailu</div>
+                <div class="text-sm text-muted">Jako přihlášený uživatel s neověřeným účtem chci mít možnost nechat si znovu zaslat ověřovací odkaz, pokud předchozí nedorazil.</div>
+            </td>
+            <td><span class="module-tag">Modul 1: Autentizace</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">0</td>
+            <td><span class="badge badge-danger">🔴 NEPOKRYTO</span></td>
+            <td><span class="text-muted">Žádný automatizovaný test</span></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-09</td>
+            <td>
+                <div class="font-semibold">Veřejný přehled a katalog kurzů</div>
+                <div class="text-sm text-muted">Jako anonymní návštěvník chci vidět seznam všech nabízených kurzů včetně cen a kapacit bez nutnosti přihlášení.</div>
+            </td>
+            <td><span class="module-tag">Modul 2: Katalog kurzů</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">2</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (2)</summary><ul class="test-list"><li><code>test_courses.py::test_courses_list_visible_for_guest</code></li><li><code>test_courses.py::test_regular_user_cannot_access_course_management</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-10</td>
+            <td>
+                <div class="font-semibold">Zobrazení detailu kurzu a termínů</div>
+                <div class="text-sm text-muted">Jako zájemce o kurz chci zobrazit podrobné informace o osnově a vypsaných termínech, abych si mohl vybrat termín konání.</div>
+            </td>
+            <td><span class="module-tag">Modul 2: Katalog kurzů</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">1</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (1)</summary><ul class="test-list"><li><code>test_courses.py::test_course_detail_navigation_and_info</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-11</td>
+            <td>
+                <div class="font-semibold">Vyhledávání a filtrování kurzů dle kapacity</div>
+                <div class="text-sm text-muted">Jako zájemce chci vyhledávat kurzy podle názvu a filtrovat je podle volné kapacity, abych rychle našel kurz s volnými místy.</div>
+            </td>
+            <td><span class="module-tag">Modul 2: Katalog kurzů</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">4</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (4)</summary><ul class="test-list"><li><code>test_courses.py::test_course_detail_full_capacity_disables_registration</code></li><li><code>test_courses.py::test_courses_search_by_keyword</code></li><li><code>test_courses.py::test_courses_search_nonexistent_keyword</code></li><li><code>test_courses.py::test_courses_filter_by_minimum_capacity</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-12</td>
+            <td>
+                <div class="font-semibold">Zápis studenta na vypsaný termín kurzu</div>
+                <div class="text-sm text-muted">Jako student se chci přihlásit na volný termín kurzu vyplněním telefonu a IČO, abych si zajistil místo na školení.</div>
+            </td>
+            <td><span class="module-tag">Modul 4: Zápis na kurzy</span></td>
+            <td class="text-center font-bold">4</td>
+            <td class="text-center font-bold text-primary">2</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (2)</summary><ul class="test-list"><li><code>test_courses.py::test_course_detail_enrollment_form_display</code></li><li><code>test_courses.py::test_course_detail_enrollment_submission_success</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-13</td>
+            <td>
+                <div class="font-semibold">Přehled zapsaných kurzů (Moje kurzy)</div>
+                <div class="text-sm text-muted">Jako přihlášený student chci mít přehled svých zapsaných kurzů na stránce Moje kurzy, abych viděl termíny svých akcí.</div>
+            </td>
+            <td><span class="module-tag">Modul 3: Zákaznická zóna</span></td>
+            <td class="text-center font-bold">3</td>
+            <td class="text-center font-bold text-primary">3</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (3)</summary><ul class="test-list"><li><code>test_my_courses.py::test_guest_cannot_see_my_courses_nav_link</code></li><li><code>test_my_courses.py::test_registered_user_can_open_my_courses_from_menu</code></li><li><code>test_my_courses.py::test_enrolled_course_visible_in_my_courses</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-14</td>
+            <td>
+                <div class="font-semibold">Vytvoření nového kurzu lektorem</div>
+                <div class="text-sm text-muted">Jako lektor chci zakládat nové vzdělávací kurzy s názvem, popisem, kapacitou a cenou, abych rozšířil nabídku školení.</div>
+            </td>
+            <td><span class="module-tag">Modul 2: Správa kurzů</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">2</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (2)</summary><ul class="test-list"><li><code>test_courses.py::test_lector_can_open_create_course_modal</code></li><li><code>test_courses.py::test_lector_can_create_new_course</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-15</td>
+            <td>
+                <div class="font-semibold">Vypsání termínu (iterace) kurzu lektorem</div>
+                <div class="text-sm text-muted">Jako lektor chci k existujícímu kurzu vypsat nový termín (datum, den, čas, místo), aby se na něj mohli studenti registrovat.</div>
+            </td>
+            <td><span class="module-tag">Modul 2: Správa kurzů</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">2</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (2)</summary><ul class="test-list"><li><code>test_courses.py::test_lector_can_open_add_iteration_modal</code></li><li><code>test_courses.py::test_lector_can_create_new_course_iteration</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-16</td>
+            <td>
+                <div class="font-semibold">Zobrazení přihlášených účastníků pro lektora</div>
+                <div class="text-sm text-muted">Jako lektor chci vidět seznam přihlášených studentů na mých kurzech, abych měl přehled o obsazenosti a účastnících.</div>
+            </td>
+            <td><span class="module-tag">Modul 2: Správa kurzů</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">1</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (1)</summary><ul class="test-list"><li><code>test_courses.py::test_lector_sees_participants_button_on_course_detail</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-17</td>
+            <td>
+                <div class="font-semibold">Personalizované uvítání nového uživatele</div>
+                <div class="text-sm text-muted">Jako nově registrovaný uživatel chci po prvním přihlášení vidět uvítací hlášku se svým jménem pro potvrzení identity.</div>
+            </td>
+            <td><span class="module-tag">Modul 5: Uživatelská zóna</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">1</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (1)</summary><ul class="test-list"><li><code>test_registration.py::test_registration_success_verifies_login_state_and_welcome</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-18</td>
+            <td>
+                <div class="font-semibold">Uživatelský profil a správa údajů</div>
+                <div class="text-sm text-muted">Jako přihlášený uživatel chci v sekci Můj Profil vidět své údaje a mít možnost aktualizovat telefon a IČO.</div>
+            </td>
+            <td><span class="module-tag">Modul 5: Uživatelská zóna</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">3</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (3)</summary><ul class="test-list"><li><code>test_profile.py::test_profile_prefilled_with_customer_data</code></li><li><code>test_profile.py::test_profile_update_ico_and_phone</code></li><li><code>test_profile.py::test_profile_navigation_from_menu</code></li></ul></details></td>
+        </tr>
+        
+        <tr>
+            <td class="font-bold">US-19</td>
+            <td>
+                <div class="font-semibold">Globální navigace a autorizační hranice</div>
+                <div class="text-sm text-muted">Jako uživatel chci funkční navigační lištu s jasným rozlišením dostupných odkazů podle přihlášeného stavu a role.</div>
+            </td>
+            <td><span class="module-tag">Modul 0: Společné komponenty</span></td>
+            <td class="text-center font-bold">0</td>
+            <td class="text-center font-bold text-primary">2</td>
+            <td><span class="badge badge-success">🟢 POKRYTO</span></td>
+            <td><details><summary>Zobrazit testy (2)</summary><ul class="test-list"><li><code>test_login.py::test_login_lector_success_and_privileges</code></li><li><code>test_navigation.py::test_navigate_to_home_page_via_navbar</code></li></ul></details></td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            Automaticky vygenerováno skillem <strong>coverage-report</strong> | Testovací framework: pytest + Playwright
+        </div>
+    </div>
+</body>
+</html>
