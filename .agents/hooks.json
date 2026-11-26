@@ -1,0 +1,11 @@
+{
+  "bug-report-dod": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python skills/bug-report/scripts/verify_bug_report_dod.py 2>nul || python .agents/skills/bug-report/scripts/verify_bug_report_dod.py",
+        "timeout": 30
+      }
+    ]
+  }
+}

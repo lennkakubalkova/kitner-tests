@@ -85,3 +85,20 @@ Každá zjištěná vada v reportu obsahuje:
 * **Dodržení `AGENTS.md`:** Žádné skripty, logy ani reporty se neukládají volně do kořene projektu.
 * **Verzované výstupy:** HTML report vad se ukládá do `docs/bug_report.html` a důkazy do `docs/evidence/` (nebo do ignorované složky `reports/`, pokud je to vyžádáno parametrem `--output`).
 * **Automatické čištění trace:** Pokud test projde úspěšně, žádné zbytečné trace soubory se neukládají na disk, čímž se šetří místo i výkon.
+
+---
+
+## 5. Vynucení Definice hotovo (Stop Hook)
+
+Systém využívá životní cyklus agenta a hook události `Stop` definovaný v `.agents/hooks.json`.
+Hook spouští validační skript `.agents/skills/bug-report/scripts/verify_bug_report_dod.py`, který **nepustí agenta skončit (`decision: "continue"`)**, dokud nejsou stoprocentně splněny všechny 3 podmínky:
+
+1. **Existuje HTML přehled:** Soubor `docs/bug_report.html` musí existovat a obsahovat vygenerovaný report.
+2. **Report pro každý padající test:** Pro každý test, který v běhu selhal (zaznamenaný v JUnit XML), musí existovat odpovídající záznam (karta vady) v HTML reportu.
+3. **Všechna povinná pole v každém reportu:** Každý záznam vady musí obsahovat:
+   * Kroky k reprodukci (číslovaný seznam kroků),
+   * Očekávaný výsledek,
+   * Skutečný výsledek (chybová zpráva / aserce),
+   * Testovací prostředí (OS, prohlížeč, URL portálu),
+   * Odkaz na existující důkaz (screenshot `.png` nebo trace `.zip` soubor v `docs/evidence/`).
+
