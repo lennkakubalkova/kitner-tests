@@ -1097,6 +1097,20 @@ def main():
     print(f"Evidence adresář: {args.evidence_dir}")
     print("-" * 80)
 
+    # Označení aktivního běhu skillu pro kontrolní Stop hook
+    marker_file = os.path.join(project_root, ".agents", "skills", "bug-report", ".last_run")
+    try:
+        os.makedirs(os.path.dirname(marker_file), exist_ok=True)
+        with open(marker_file, "w", encoding="utf-8") as mf:
+            json.dump({
+                "timestamp": time.time(),
+                "datetime": datetime.now().isoformat(),
+                "test_path": args.test_path,
+                "k_filter": args.k_filter
+            }, mf, indent=2)
+    except Exception:
+        pass
+
     # 1. Spuštění testů a zachycení selhání
     total_tests, failures, duration = run_tests_and_collect_failures(
         project_root=project_root,

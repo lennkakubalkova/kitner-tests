@@ -3,27 +3,25 @@
 """
 verify_bug_report_dod.py
 ------------------------
-Stop hook pro Antigravity Agent:
-Vynucuje Definici hotovo (Definition of Done) pro reportování chyb:
-Nepustí agenta skončit, dokud:
-1. Existuje HTML přehled (docs/bug_report.html).
-2. Je v něm report pro každý padající test.
-3. Každý report má všechna povinná pole:
-   - kroky k reprodukci,
-   - očekávaný výsledek,
-   - skutečný výsledek,
-   - prostředí,
-   - odkaz na důkaz (screenshot nebo trace z testu).
+Stop hook pro Antigravity Agent (podle kapitoly 5):
+1. ZASAHUJE POUZE TEHDY, KDYŽ BĚŽEL SKILL bug-report:
+   - Pokud uživatel ani agent v tomto turnu/úloze nepracoval se skillem bug-report
+     (ani nespustil testy pro hlášení chyb), hook okamžitě povolí ukončení {"decision": "allow"}.
+2. KONTROLUJE DETAILNÍ OBSAH REPORTU, NE JEN EXISTENCI SOUBORU:
+   - Existence a validita HTML struktury docs/bug_report.html.
+   - Aktuálnost reportu (nesmí být zastaralý vůči poslednímu běhu testů).
+   - Kompletní pokrytí všech padajících testů z posledního testovacího běhu (JUnit XML).
+   - Kontrola všech povinných polí v každém záznamu vady (kroky k reprodukci, očekávaný výsledek,
+     skutečný výsledek, prostředí, fyzická existence a neprázdnost screenshotu / trace souboru).
 
-Používá výhradně standardní knihovnu Pythonu (žádné externí závislosti).
-Vstup: JSON na stdin (kontext hooku).
-Výstup: JSON na stdout: {"decision": "allow"} nebo {"decision": "continue", "reason": "..."}.
+Používá výhradně standardní knihovnu Pythonu.
 """
 
 import os
 import sys
 import re
 import json
+import time
 import threading
 import xml.etree.ElementTree as ET
 
@@ -56,17 +54,14 @@ def read_stdin_with_timeout(timeout_sec: float = 0.5) -> dict:
 
 def find_project_root(hook_input: dict) -> str:
     """Určí kořenový adresář projektu z kontextu hooku nebo z CWD."""
-    # 1. Z workspacePaths v kontextu
     ws_paths = hook_input.get("workspacePaths", [])
     if ws_paths and os.path.exists(ws_paths[0]):
         return os.path.abspath(ws_paths[0])
 
-    # 2. Z cwd v kontextu
     cwd = hook_input.get("cwd")
     if cwd and os.path.exists(cwd):
         return os.path.abspath(cwd)
 
-    # 3. Z aktuálního pracovního adresáře
     curr = os.path.abspath(os.getcwd())
     while curr and os.path.dirname(curr) != curr:
         if os.path.exists(os.path.join(curr, "pytest.ini")) or os.path.exists(os.path.join(curr, ".git")):
@@ -76,8 +71,49 @@ def find_project_root(hook_input: dict) -> str:
     return os.path.abspath(os.getcwd())
 
 
-def get_failing_tests_from_junit(project_root: str) -> list[dict]:
-    """Získá seznam padajících testů z posledního JUnit XML reportu."""
+def is_skill_active_in_session(hook_input: dict, project_root: str) -> bool:
+    """
+    KAPITOLA 5: Hook má zasahovat JEN TEHDY, když běžel tenhle skill!
+    Zjišťuje, zda v aktuální konverzaci či v posledním turnu byl aktivován skill bug-report.
+    """
+    # 1. Kontrola posledního uživatelského vstupu
+    last_user_input = hook_input.get("lastUserInput", "").lower()
+    bug_report_keywords = [
+        "bug-report", "bug_report", "reportovat chyb", "reportování chyb", "hlášení chyb",
+        "přehled chyb", "vytvořte report", "vytvořit report", "defect report", "stop hook",
+        "kapitola 5", "definici hotovo vynuťte", "ověřte hook", "padající test"
+    ]
+    if any(kw in last_user_input for kw in bug_report_keywords):
+        return True
+
+    # 2. Kontrola transcriptu konverzace (posledních kroků agenta)
+    transcript_path = hook_input.get("transcriptPath")
+    if transcript_path and os.path.exists(transcript_path):
+        try:
+            with open(transcript_path, "r", encoding="utf-8") as tf:
+                lines = tf.readlines()[-60:]
+                tail = "".join(lines).lower()
+                if "bug-report" in tail or "generate_bug_report" in tail or "verify_bug_report_dod" in tail:
+                    return True
+        except Exception:
+            pass
+
+    # 3. Kontrola markeru posledního běhu skriptu (.last_run)
+    marker_file = os.path.join(project_root, ".agents", "skills", "bug-report", ".last_run")
+    if os.path.exists(marker_file):
+        try:
+            mtime = os.path.getmtime(marker_file)
+            # Pokud skript běžel v posledních 30 minutách
+            if (time.time() - mtime) < 1800:
+                return True
+        except Exception:
+            pass
+
+    return False
+
+
+def get_failing_tests_from_junit(project_root: str) -> tuple[list[dict], float | None]:
+    """Získá seznam padajících testů z posledního JUnit XML reportu a jeho timestamp."""
     junit_candidates = [
         os.path.join(project_root, "reports", "junit_temp_report.xml"),
         os.path.join(project_root, "reports", "junit_report.xml"),
@@ -86,6 +122,7 @@ def get_failing_tests_from_junit(project_root: str) -> list[dict]:
     for jpath in junit_candidates:
         if os.path.exists(jpath):
             try:
+                mtime = os.path.getmtime(jpath)
                 tree = ET.parse(jpath)
                 root = tree.getroot()
                 suites = root.findall(".//testsuite") if root.tag != "testsuite" else [root]
@@ -104,188 +141,206 @@ def get_failing_tests_from_junit(project_root: str) -> list[dict]:
                                 "classname": classname,
                                 "message": (fail if fail is not None else err).attrib.get("message", "")
                             })
-                return failing
+                return failing, mtime
             except Exception:
                 pass
 
-    return []
+    return [], None
 
 
-def validate_defect_card(card_html: str, project_root: str, html_dir: str) -> list[str]:
+def validate_defect_card_content(card_html: str, html_dir: str) -> list[str]:
     """
-    Ověří přítomnost všech povinných polí v kartě vady:
-    - kroky k reprodukci
-    - očekávaný výsledek
-    - skutečný výsledek
-    - prostředí
-    - odkaz na důkaz (screenshot nebo trace z testu s existujícím souborem)
+    KAPITOLA 5: Kontrola OBSAHU každé karty vady v reportu (nejen prázdné tagy):
+    - Kroky k reprodukci: musí obsahovat alespoň jeden neprázdný krok s reálným textem
+    - Očekávaný výsledek: smysluplný neprázdný popis očekávání
+    - Skutečný výsledek: smysluplný popis zjištěného stavu / chyby
+    - Prostředí: prostředí musí být uvedeno
+    - Odkaz na důkaz: musí existovat odkaz na screenshot / trace a soubor musí fyzicky existovat na disku s velikostí > 0 B
     """
     missing = []
 
-    # 1. Kroky k reprodukci
-    has_steps = False
+    # 1. Kroky k reprodukci (repro-steps)
+    has_valid_steps = False
     repro_match = re.search(r'<ol[^>]*class="[^"]*repro-steps[^"]*"[^>]*>(.*?)</ol>', card_html, re.DOTALL)
-    if repro_match and "<li>" in repro_match.group(1):
-        has_steps = True
-    elif "Kroky k reprodukci" in card_html and "<li" in card_html:
-        has_steps = True
-    if not has_steps:
-        missing.append("Kroky k reprodukci (repro-steps)")
+    if repro_match:
+        li_items = re.findall(r'<li[^>]*>(.*?)</li>', repro_match.group(1), re.DOTALL)
+        # Ověření, že kroky obsahují skutečný obsah (> 5 znaků)
+        valid_items = [re.sub(r'<[^>]+>', '', li).strip() for li in li_items if len(re.sub(r'<[^>]+>', '', li).strip()) > 5]
+        if len(valid_items) >= 1:
+            has_valid_steps = True
 
-    # 2. Očekávaný výsledek
-    has_expected = False
-    exp_match = re.search(r'class="[^"]*expected-box[^"]*"[^>]*>.*?<p>(.*?)</p>', card_html, re.DOTALL)
-    if exp_match and exp_match.group(1).strip():
-        has_expected = True
-    elif "Očekávaný výsledek" in card_html:
-        has_expected = True
-    if not has_expected:
-        missing.append("Očekávaný výsledek (expected result)")
+    if not has_valid_steps:
+        missing.append("Kroky k reprodukci (chybí smysluplné číslované kroky v <ol class='repro-steps'>)")
 
-    # 3. Skutečný výsledek
-    has_actual = False
-    act_match = re.search(r'class="[^"]*actual-box[^"]*"[^>]*>.*?<p>(.*?)</p>', card_html, re.DOTALL)
-    if act_match and act_match.group(1).strip():
-        has_actual = True
-    elif "Skutečný výsledek" in card_html:
-        has_actual = True
-    if not has_actual:
-        missing.append("Skutečný výsledek (actual result)")
+    # 2. Očekávaný výsledek (expected result)
+    has_valid_expected = False
+    exp_match = re.search(r'class="[^"]*expected-box[^"]*"[^>]*>.*?<p[^>]*>(.*?)</p>', card_html, re.DOTALL)
+    if exp_match:
+        exp_text = re.sub(r'<[^>]+>', '', exp_match.group(1)).strip()
+        if len(exp_text) > 8:
+            has_valid_expected = True
 
-    # 4. Odkaz na důkaz (Screenshot nebo Trace) a ověření existence souboru na disku
-    has_evidence = False
-    evidence_found = []
+    if not has_valid_expected:
+        missing.append("Očekávaný výsledek (chybí nebo je prázdný v <div class='expected-box'>)")
+
+    # 3. Skutečný výsledek (actual result)
+    has_valid_actual = False
+    act_match = re.search(r'class="[^"]*actual-box[^"]*"[^>]*>.*?<p[^>]*>(.*?)</p>', card_html, re.DOTALL)
+    if act_match:
+        act_text = re.sub(r'<[^>]+>', '', act_match.group(1)).strip()
+        if len(act_text) > 8:
+            has_valid_actual = True
+
+    if not has_valid_actual:
+        missing.append("Skutečný výsledek (chybí nebo je prázdný v <div class='actual-box'>)")
+
+    # 4. Odkaz na důkaz a fyzická kontrola existence souboru na disku
+    has_valid_evidence = False
+    evidence_desc = []
 
     # Screenshot kontrola
     scr_matches = re.findall(r'<a\s+[^>]*href=["\']([^"\']+\.png)["\']', card_html, re.IGNORECASE)
     for scr in scr_matches:
         abs_scr = os.path.normpath(os.path.join(html_dir, scr)) if not os.path.isabs(scr) else scr
-        if os.path.exists(abs_scr):
-            has_evidence = True
-            evidence_found.append(f"Screenshot: {os.path.basename(abs_scr)}")
+        if os.path.exists(abs_scr) and os.path.getsize(abs_scr) > 100:
+            has_valid_evidence = True
+            evidence_desc.append(f"Screenshot ({os.path.basename(abs_scr)})")
 
     # Trace kontrola
     trc_matches = re.findall(r'<a\s+[^>]*href=["\']([^"\']+\.zip)["\']', card_html, re.IGNORECASE)
     for trc in trc_matches:
         abs_trc = os.path.normpath(os.path.join(html_dir, trc)) if not os.path.isabs(trc) else trc
-        if os.path.exists(abs_trc):
-            has_evidence = True
-            evidence_found.append(f"Trace: {os.path.basename(abs_trc)}")
+        if os.path.exists(abs_trc) and os.path.getsize(abs_trc) > 100:
+            has_valid_evidence = True
+            evidence_desc.append(f"Trace ({os.path.basename(abs_trc)})")
 
-    if not has_evidence:
-        missing.append("Odkaz na existující důkaz (screenshot .png nebo trace .zip soubor)")
+    if not has_valid_evidence:
+        missing.append("Odkaz na platný existující důkaz (screenshot .png nebo trace .zip soubor větší než 100 B)")
 
     return missing
 
 
 def verify_definition_of_done(project_root: str) -> tuple[bool, list[str]]:
     """
-    Vyhodnotí všechny 3 podmínky Definice hotovo:
-    1. existuje HTML přehled (docs/bug_report.html),
-    2. je v něm report pro každý padající test,
-    3. každý report má všechna povinná pole.
+    Detailní kontrola obsahu a pravidel Definice hotovo:
+    1. Existuje HTML přehled.
+    2. HTML má platnou a neporušenou strukturu včetně hlavičky s prostředím.
+    3. Je v něm report pro každý padající test z testovacího běhu.
+    4. Každý report má všechna povinná pole s reálným obsahem.
     """
     issues = []
 
     html_path = os.path.join(project_root, "docs", "bug_report.html")
     html_dir = os.path.dirname(html_path)
 
-    # Podmínka 1: Existuje HTML přehled
+    # 1. Existence HTML souboru
     if not os.path.exists(html_path):
-        issues.append(f"HTML přehled chyb neexistuje na očekávané cestě: '{os.path.relpath(html_path, project_root)}'.")
+        issues.append(f"HTML přehled chyb neexistuje: '{os.path.relpath(html_path, project_root)}'.")
         return False, issues
 
     try:
+        html_mtime = os.path.getmtime(html_path)
         with open(html_path, "r", encoding="utf-8") as f:
             html_content = f.read()
     except Exception as e:
-        issues.append(f"Nelze přečíst HTML přehled '{html_path}': {e}")
+        issues.append(f"Nelze přečíst HTML soubor '{html_path}': {e}")
         return False, issues
 
-    if len(html_content.strip()) < 100:
-        issues.append(f"HTML přehled '{html_path}' je prázdný nebo nekompletní.")
+    # 2. Kontrola integrity HTML obsahu (ne jen pouhá existence souboru)
+    if len(html_content.strip()) < 300:
+        issues.append(f"Soubor '{html_path}' je příliš krátký nebo neúplný (délka {len(html_content.strip())} znaků).")
         return False, issues
 
-    # Kontrola globálního pole: Testovací prostředí
-    has_environment = bool(re.search(r'class="[^"]*env-tag[^"]*"', html_content) or "Prostředí:" in html_content)
-    if not has_environment:
-        issues.append("V HTML přehledu chybí specifikace testovacího prostředí (OS, prohlížeč, URL portálu).")
+    if "<!DOCTYPE html>" not in html_content or "</html>" not in html_content:
+        issues.append("Soubor 'docs/bug_report.html' není platný HTML5 dokument.")
 
-    # Podmínka 2: Je v něm report pro každý padající test
-    failing_tests = get_failing_tests_from_junit(project_root)
+    if 'class="kpi-grid"' not in html_content:
+        issues.append("V HTML přehledu chybí souhrnné metriky (kpi-grid).")
 
-    # Extrakce karet vad z HTML
-    # Karty jsou v <div class="defect-card ... id="BUG-XX">...</div>
-    card_pattern = r'(<div[^>]*class="[^"]*defect-card[^"]*"[^>]*id="([^"]+)"[^>]*>.*?</div>\s*</div>)'
+    # 3. Kontrola specifikace testovacího prostředí
+    has_env = "env-tag" in html_content and ("Prostředí:" in html_content or "http" in html_content)
+    if not has_env:
+        issues.append("V HTML přehledu chybí specifikace testovacího prostředí (URL, OS, prohlížeč).")
+
+    # 4. Kontrola padajících testů vůči obsahu reportu
+    failing_tests, junit_mtime = get_failing_tests_from_junit(project_root)
+
+    # Kontrola aktuálnosti: pokud JUnit běžel podstatně později než HTML report
+    if junit_mtime and (junit_mtime - html_mtime) > 10.0:
+        issues.append("HTML report je zastaralý – byl vygenerován dříve než poslední testovací běh. Spusťte generování znovu.")
+
+    # Extrakce karet vad
     cards = re.findall(r'<div[^>]*class="[^"]*defect-card[^"]*".*?(?=<div[^>]*class="[^"]*defect-card|\Z)', html_content, re.DOTALL)
 
     if failing_tests:
         for ft in failing_tests:
-            # Hledáme, zda je test zastoupen v některé kartě
-            test_repr = ft["clean_name"]
-            found_card = False
+            # Kontrola, zda je pro padající test obsažena karta vady
+            test_found = False
             for card in cards:
-                if test_repr in card or ft["name"] in card:
-                    found_card = True
+                if ft["clean_name"] in card or ft["name"] in card:
+                    test_found = True
                     break
-            if not found_card:
-                issues.append(f"Pro padající test '{ft['name']}' chybí report v HTML přehledu.")
+            if not test_found:
+                issues.append(f"Pro padající test '{ft['name']}' chybí karta vady v HTML přehledu.")
 
-    # Podmínka 3: Každý report má všechna povinná pole
+    # 5. Kontrola obsahu každého reportu (povinná pole)
     if cards:
         for idx, card in enumerate(cards, 1):
             id_match = re.search(r'id=["\'](BUG-\d+)["\']', card)
-            card_id = id_match.group(1) if id_match else f"Vada #{idx}"
+            card_id = id_match.group(1) if id_match else f"BUG-{idx:02d}"
 
             test_name_match = re.search(r'<strong>(.*?)</strong>', card)
             test_name = test_name_match.group(1) if test_name_match else "Neznámý test"
 
-            missing_fields = validate_defect_card(card, project_root, html_dir)
-            if missing_fields:
-                issues.append(f"Karta '{card_id}' ({test_name}) nemá splněna povinná pole: {', '.join(missing_fields)}.")
+            missing = validate_defect_card_content(card, html_dir)
+            if missing:
+                issues.append(f"Vada '{card_id}' ({test_name}) nemá řádně vyplněna pole: {'; '.join(missing)}.")
     else:
-        # Pokud nejsou žádné karty vad, zkontrolujeme, zda report explicitně deklaruje úspěch
-        is_success = "Všechny automatizované testy proběhly bez chyb" in html_content or "success-banner" in html_content
+        # Žádné karty vad: zkontrolujeme, zda report legitimně deklaruje úspěch (0 vad)
+        is_success = "success-banner" in html_content or "Všechny automatizované testy proběhly bez chyb" in html_content
         if not is_success and failing_tests:
-            issues.append("V HTML přehledu chybí karty identifikovaných vad.")
+            issues.append("V HTML přehledu chybí záznamy zjištěných vad pro padající testy.")
 
     is_valid = len(issues) == 0
     return is_valid, issues
 
 
 def main():
-    # 1. Čtení stdin s JSON kontextem Antigravity (bezpečně s timeoutem)
+    # 1. Načtení kontextu hooku
     hook_input = read_stdin_with_timeout(timeout_sec=0.5)
 
-    # Určení kořene projektu
+    # 2. Určení kořene projektu
     project_root = find_project_root(hook_input)
 
-    # Vyhodnocení Definice hotovo
+    # 3. KAPITOLA 5: Kontrola, zda v tomto běhu běžel skill bug-report
+    if not is_skill_active_in_session(hook_input, project_root):
+        # Skill nebyl v tomto běhu aktivován -> hook nekontroluje a povolí ukončení
+        sys.stderr.write("ℹ️ Stop Hook: Skill bug-report nebyl v tomto turnu aktivován. Kontrola přeskočena (allow).\n")
+        print(json.dumps({"decision": "allow"}, ensure_ascii=False))
+        return
+
+    # 4. Pokud skill běžel, provede se striktní kontrola obsahu reportu
     is_valid, issues = verify_definition_of_done(project_root)
 
     if is_valid:
-        # Všechny požadavky jsou 100% splněny -> povolíme ukončení agenta
         response = {
             "decision": "allow"
         }
-        sys.stderr.write("✅ Definice hotovo (Stop Hook): HTML přehled je platný, všechny padající testy mají report se všemi povinnými poli.\n")
+        sys.stderr.write("✅ Definice hotovo (Stop Hook): HTML přehled i jeho obsah jsou 100% v pořádku.\n")
     else:
-        # Podmínky nejsou splněny -> nepustíme agenta skončit a předáme důvod
         reasons_text = "\n".join([f"  • {issue}" for issue in issues])
         response = {
             "decision": "continue",
             "reason": (
-                "⚠️ STOP HOOK: Definice hotovo není splněna! "
-                "Agent nesmí skončit, dokud nebudou splněny všechny následující požadavky:\n"
+                "⚠️ STOP HOOK (Definice hotovo pro bug-report): Agent nesmí skončit, dokud nejsou splněny podmínky:\n"
                 f"{reasons_text}\n\n"
-                "Opravte chyby, spusťte generování reportu 'python .agents/skills/bug-report/scripts/generate_bug_report.py' "
-                "a zajistěte, aby každý padající test měl kompletní report s kroky k reprodukci, očekávaným i skutečným výsledkem, "
-                "prostředím a odkazem na existující důkaz (screenshot nebo trace)."
+                "Zajistěte, aby existoval HTML přehled 'docs/bug_report.html' a obsahoval kompletní záznam "
+                "pro každý padající test se všemi povinnými poli (kroky k reprodukci, očekávaný výsledek, "
+                "skutečný výsledek, prostředí a odkaz na platný důkaz)."
             )
         }
         sys.stderr.write(f"❌ Stop Hook odmítl ukončení:\n{response['reason']}\n")
 
-    # Výstup na stdout
     print(json.dumps(response, ensure_ascii=False, indent=2))
 
 
